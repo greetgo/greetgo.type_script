@@ -1,10 +1,65 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'idea'
+def nowDate = new Date()
+def nowFormattedDate = nowDate.format("yyyy-MM-dd/HH:mm:ss")
+def vendorName = "greetgo!"
+def ggRepo = System.getenv('GG_REPO')
 
-repositories {
-    jcenter()
+allprojects {
+  apply plugin: 'java'
+  apply plugin: 'eclipse'
+  apply plugin: 'maven'
+  apply plugin: 'idea'
+
+  version = '0.0.1'
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
+  group = "kz.greetgo.type_script"
+
+  eclipse.project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
 }
 
-dependencies {
+subprojects {
+
+  project.eclipse.classpath.file.whenMerged { cp ->
+    if (project.hasProperty("sourceCompatibility")) {
+      cp.entries.findAll { it.path.contains('JRE_CONTAINER') }.each {
+        it.path += "/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/" +
+          "JavaSE-$project.sourceCompatibility"
+      }
+    }
+  }
+
+  repositories {
+    mavenLocal()
+    if (ggRepo?.trim()) maven { url ggRepo.trim() }
+    jcenter()
+  }
+
+  dependencies {
+    ext.guavaVersion = '23.0'
+
+    testCompile 'org.testng:testng:6.5.1'
+    compile 'org.easytesting:fest-assert-core:2.0M10'
+  }
+
+  jar {
+    manifest {
+      attributes 'Implementation-Title': project.name
+      attributes 'Implementation-Version': version
+      attributes 'Implementation-Vendor': vendorName
+      attributes 'Created-By': System.getProperty("user.name")
+      attributes 'Created-At': nowFormattedDate
+    }
+  }
+
+  [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+  [compileJava, compileTestJava]*.options*.debugOptions*.debugLevel = "source,lines,vars"
+  sourceSets.main.java.srcDirs = ["src"]
+  sourceSets.main.resources.srcDirs = ["src", "src_resources"]
+  sourceSets.test.java.srcDirs = ["test_src"]
+  sourceSets.test.resources.srcDirs = ["test_src", "test_resources"]
+
+  //noinspection GroovyMissingReturnStatement
+  test { useTestNG() }
 }
