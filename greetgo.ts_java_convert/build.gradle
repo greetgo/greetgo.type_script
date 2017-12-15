@@ -1,0 +1,3 @@
+dependencies {
+  testCompile "kz.greetgo:greetgo.util:$greetgoUtil"
+}

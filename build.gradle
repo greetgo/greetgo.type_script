@@ -38,6 +38,7 @@ subprojects {
 
   dependencies {
     ext.guavaVersion = '23.0'
+    ext.greetgoUtil = '0.0.27'
 
     testCompile 'org.testng:testng:6.5.1'
     compile 'org.easytesting:fest-assert-core:2.0M10'

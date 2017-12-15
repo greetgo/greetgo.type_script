@@ -47,9 +47,10 @@ public class TsFileReference {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("TsFileWithSubPackage{");
+    //noinspection StringBufferReplaceableByString
+    final StringBuilder sb = new StringBuilder("TsFileReference{");
     sb.append("tsFile=").append(tsFile);
-    sb.append(", subPackage='").append(subPackage).append('\'');
+    sb.append(", subPackage=").append(subPackage == null ? "<NULL>" : subPackage);
     sb.append('}');
     return sb.toString();
   }
