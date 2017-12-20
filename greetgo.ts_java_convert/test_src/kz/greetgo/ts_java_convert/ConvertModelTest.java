@@ -1,8 +1,13 @@
 package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedLong;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeInt;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeLong;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -30,7 +35,11 @@ public class ConvertModelTest {
 
     assertThat(fr.classStructure).isNull();
 
+    //
+    //
     convertModel.defineStructure(singletonList(fr));
+    //
+    //
 
     assertThat(fr.classStructure).isNotNull();
     assertThat(fr.sourceDir).isEqualTo(dir.sourceDir());
@@ -58,7 +67,11 @@ public class ConvertModelTest {
 
     assertThat(fr.classStructure).isNull();
 
+    //
+    //
     convertModel.defineStructure(singletonList(fr));
+    //
+    //
 
     assertThat(fr.classStructure).isNotNull();
 
@@ -123,6 +136,79 @@ public class ConvertModelTest {
       "strArrayField",
       "strArrayOrNullField",
       "strArrayOrNullField2"
+    );
+  }
+
+  @DataProvider
+  public Object[][] defineStructure_numberField_DP() {
+    return new Object[][]{
+      {"numberIntField", SimpleTypeInt.class, false, true},
+      {"numberIntArrayField1", SimpleTypeInt.class, true, false},
+      {"numberIntArrayField2", SimpleTypeInt.class, true, false},
+      {"numberIntOrNullField1", SimpleTypeBoxedInt.class, false, false},
+      {"numberIntOrNullField2", SimpleTypeBoxedInt.class, false, false},
+      {"numberIntOrNullField3", SimpleTypeBoxedInt.class, false, false},
+      {"numberLongField", SimpleTypeLong.class, false, false},
+      {"numberLongArrayField1", SimpleTypeLong.class, true, false},
+      {"numberLongArrayField2", SimpleTypeLong.class, true, false},
+      {"numberLongOrNullField1", SimpleTypeBoxedLong.class, false, false},
+      {"numberLongOrNullField2", SimpleTypeBoxedLong.class, false, false},
+      {"numberLongOrNullField3", SimpleTypeBoxedLong.class, false, false},
+
+    };
+  }
+
+  @Test(dataProvider = "defineStructure_numberField_DP")
+  public void defineStructure_numberField(String fieldName,
+                                          Class<?> fieldClass,
+                                          boolean isArray,
+                                          boolean checkFieldExists) throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/ClassWithNumberField.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithNumberField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+
+    assertThat(fr.classStructure).isNotNull();
+
+    Map<String, ClassAttr> attrMap = fr.classStructure
+      .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
+
+    {
+      ClassAttr attr = attrMap.get(fieldName);
+      assertThat(attr).isNotNull();
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(fieldClass.getName());
+      assertThat(attr.isArray).isEqualTo(isArray);
+      assertThat(attr.comment).isEmpty();
+    }
+
+    if (!checkFieldExists) return;
+
+    List<String> attrNames = fr.classStructure.attrList.stream().map(a -> a.name).collect(toList());
+    assertThat(attrNames).containsExactly(
+      "numberIntField",
+      "numberIntArrayField1",
+      "numberIntArrayField2",
+      "numberIntOrNullField1",
+      "numberIntOrNullField2",
+      "numberIntOrNullField3",
+      "numberLongField",
+      "numberLongArrayField1",
+      "numberLongArrayField2",
+      "numberLongOrNullField1",
+      "numberLongOrNullField2",
+      "numberLongOrNullField3"
     );
   }
 
