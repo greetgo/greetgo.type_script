@@ -109,7 +109,10 @@ public class TsFileReference {
 
   //public world: string;
   private static final Pattern STRING_FIELD
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*string\\s*(\\|\\s*null)?\\s*(\\[\\s*]\\s*)?;\\s*.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*string\\s*(\\[\\s*]\\s*)?\\s*(\\|\\s*null)?;.*");
+
+  private static final Pattern STRING_FIELD2
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?;.*");
 
   //public count: number/*int*/;
   private static final Pattern NUMBER_FIELD
@@ -197,7 +200,16 @@ public class TsFileReference {
     {
       Matcher matcher = STRING_FIELD.matcher(line);
       if (matcher.matches()) {
-        attrList.add(new ClassAttr(SimpleTypeStr.get(), matcher.group(1), matcher.group(3) != null, comment));
+        attrList.add(new ClassAttr(SimpleTypeStr.get(), matcher.group(1), matcher.group(2) != null, comment));
+        comment.clear();
+        return;
+      }
+    }
+
+    {
+      Matcher matcher = STRING_FIELD2.matcher(line);
+      if (matcher.matches()) {
+        attrList.add(new ClassAttr(SimpleTypeStr.get(), matcher.group(1), matcher.group(2) != null, comment));
         comment.clear();
         return;
       }

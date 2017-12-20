@@ -6,9 +6,14 @@ import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @SuppressWarnings("RedundantThrows")
@@ -57,14 +62,68 @@ public class ConvertModelTest {
 
     assertThat(fr.classStructure).isNotNull();
 
+    Map<String, ClassAttr> attrMap = fr.classStructure
+      .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
 
-    assertThat(fr.classStructure.attrList).hasSize(1);
+    {
+      ClassAttr attr = attrMap.get("strField");
+      assertThat(attr).isNotNull();
 
-    ClassAttr attr = fr.classStructure.attrList.get(0);
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isFalse();
+      assertThat(attr.comment).isEqualTo(asList("  /**", "   * string field", "   * line 2 of comment", "   */"));
+    }
+    {
+      ClassAttr attr = attrMap.get("strOrNullField");
+      assertThat(attr).isNotNull();
 
-    assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-    assertThat(attr.isArray).isFalse();
-    assertThat(attr.name).isEqualTo("strField");
-    assertThat(attr.comment).isEqualTo(asList("  /**", "   * string field", "   * line 2 of comment", "   */"));
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isFalse();
+      assertThat(attr.comment).isEmpty();
+    }
+    {
+      ClassAttr attr = attrMap.get("strOrNullField2");
+      assertThat(attr).isNotNull();
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isFalse();
+      assertThat(attr.comment).isEmpty();
+    }
+
+    {
+      ClassAttr attr = attrMap.get("strArrayField");
+      assertThat(attr).isNotNull();
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isTrue();
+      assertThat(attr.comment).isEmpty();
+    }
+    {
+      ClassAttr attr = attrMap.get("strArrayOrNullField");
+      assertThat(attr).isNotNull();
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isTrue();
+      assertThat(attr.comment).isEmpty();
+    }
+    {
+      ClassAttr attr = attrMap.get("strArrayOrNullField2");
+      assertThat(attr).isNotNull();
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
+      assertThat(attr.isArray).isTrue();
+      assertThat(attr.comment).isEmpty();
+    }
+
+    List<String> attrNames = fr.classStructure.attrList.stream().map(a -> a.name).collect(toList());
+    assertThat(attrNames).containsExactly(
+      "strField",
+      "strOrNullField",
+      "strOrNullField2",
+      "strArrayField",
+      "strArrayOrNullField",
+      "strArrayOrNullField2"
+    );
   }
+
 }
