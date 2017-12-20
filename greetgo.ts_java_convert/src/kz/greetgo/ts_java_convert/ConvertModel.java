@@ -23,6 +23,19 @@ public class ConvertModel {
   public void exec() throws Exception {
     List<TsFileReference> files = TsFileReference.scanForTs(sourceDir);
 
+    defineStructure(files);
+
+    for (TsFileReference file : files) {
+      System.out.println(file);
+      for (ClassAttr classAttr : file.attrList) {
+        System.out.println("    " + classAttr);
+      }
+
+      generate(file.classStructure, destinationDir);
+    }
+  }
+
+  void defineStructure(List<TsFileReference> files) throws Exception {
     for (TsFileReference file : files) {
       file.anotherFiles = ConvertModelUtil.deleteIt(file, files);
       file.sourceDir = sourceDir;
@@ -32,15 +45,6 @@ public class ConvertModel {
 
     for (TsFileReference file : files) {
       file.fillAttributes();
-    }
-
-    for (TsFileReference file : files) {
-      System.out.println(file);
-      for (ClassAttr classAttr : file.attrList) {
-        System.out.println("    " + classAttr);
-      }
-
-      generate(file.classStructure, destinationDir);
     }
   }
 
