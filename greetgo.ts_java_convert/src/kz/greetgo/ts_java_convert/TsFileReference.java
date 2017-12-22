@@ -4,11 +4,13 @@ package kz.greetgo.ts_java_convert;
 import kz.greetgo.ts_java_convert.errors.BooleanCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.errors.CannotFindClassInImports;
 import kz.greetgo.ts_java_convert.errors.ClassCannotBeMultipleArray;
+import kz.greetgo.ts_java_convert.errors.CommaAtLastEnumElement;
 import kz.greetgo.ts_java_convert.errors.NoFileInImport;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
+import kz.greetgo.ts_java_convert.stru.EnumElement;
 import kz.greetgo.ts_java_convert.stru.Import;
 import kz.greetgo.ts_java_convert.stru.SimpleType;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
@@ -39,7 +41,7 @@ public class TsFileReference {
 
   public void defineRealPackage(String packagePrefix) {
     String realPackage = resolvePackage(packagePrefix, subPackage);
-    classStructure = new ClassStructure(realPackage, className, attrList, classComment);
+    classStructure = new ClassStructure(realPackage, className, attrList, enumElementList, classComment);
   }
 
   public String content() {
@@ -100,20 +102,27 @@ public class TsFileReference {
 
   final List<String> classComment = new ArrayList<>();
   boolean wasClassDefinition = false;
+  boolean wasEnumDefinition = false;
 
   public void fillAttributes() throws Exception {
     wasClassDefinition = false;
+    wasEnumDefinition = false;
 
     int lineNo = 1;
     for (String line : content().split("\n")) {
       parseLine(lineNo++, line);
     }
 
-    if (!wasClassDefinition) throw new RuntimeException("No class definition in " + tsFile);
+    if (!wasClassDefinition && !wasEnumDefinition) {
+      throw new RuntimeException("No class or enum definition in " + tsFile);
+    }
   }
 
   private static final Pattern CLASS_DEFINITION
     = Pattern.compile("\\s*export\\s+class\\s+(\\w+)[^{]*\\{\\s*");
+
+  private static final Pattern ENUM_DEFINITION
+    = Pattern.compile("\\s*export\\s+enum\\s+(\\w+)[^{]*\\{\\s*");
 
   //public world: string;
   private static final Pattern STRING_FIELD
@@ -153,6 +162,7 @@ public class TsFileReference {
 
   private final Map<String, Import> importMap = new HashMap<>();
   public final List<ClassAttr> attrList = new ArrayList<>();
+  public final List<EnumElement> enumElementList = new ArrayList<>();
 
   private static final Pattern COMMENT_BEGIN = Pattern.compile("\\s*/\\*\\*\\s*");
   private static final Pattern COMMENT_END = Pattern.compile("\\s*\\*/\\s*");
@@ -160,7 +170,6 @@ public class TsFileReference {
   boolean inComment = false;
 
   private void parseLine(int lineNo, String line) throws Exception {
-//    System.out.println("line : " + line);
 
     if (inComment) {
       inComment = !COMMENT_END.matcher(line).matches();
@@ -199,7 +208,11 @@ public class TsFileReference {
 
     {
       Matcher matcher = CLASS_DEFINITION.matcher(line);
+      //noinspection Duplicates
       if (matcher.matches()) {
+        if (wasEnumDefinition) {
+          throw new RuntimeException("You cannot define enum and class in one file: " + place(lineNo));
+        }
         String lineClassName = matcher.group(1);
         registerImport(lineNo, lineClassName, tsFile);
         if (lineClassName.equals(className)) {
@@ -213,6 +226,72 @@ public class TsFileReference {
       }
     }
 
+    {
+      Matcher matcher = ENUM_DEFINITION.matcher(line);
+      //noinspection Duplicates
+      if (matcher.matches()) {
+        if (wasClassDefinition) {
+          throw new RuntimeException("You cannot define enum and class in one file: " + place(lineNo));
+        }
+        String lineClassName = matcher.group(1);
+        registerImport(lineNo, lineClassName, tsFile);
+        if (lineClassName.equals(className)) {
+          wasEnumDefinition = true;
+          classComment.addAll(comment);
+          comment.clear();
+          return;
+        }
+        comment.clear();
+        throw new RuntimeException("Left class name " + lineClassName + " at " + place(lineNo));
+      }
+    }
+
+    if (wasClassDefinition) parseForClassField(line, lineNo);
+    if (wasEnumDefinition) parseForEnumElement(line, lineNo);
+
+  }
+
+  private static final Pattern ENUM_ELEMENT1 = Pattern.compile("\\s*(\\w+)\\s*=\\s*\"([^\"]*)\"\\s*(,)?.*");
+  private static final Pattern ENUM_ELEMENT2 = Pattern.compile("\\s*(\\w+)\\s*=\\s*'([^']*)'\\s*(,)?.*");
+
+  private void parseForEnumElement(String line, @SuppressWarnings("unused") int lineNo) {
+    {
+      Matcher matcher = ENUM_ELEMENT1.matcher(line);
+      //noinspection Duplicates
+      if (matcher.matches()) {
+
+        String elementName = matcher.group(1);
+        String elementValue = matcher.group(2);
+        boolean hasComma = matcher.group(3) != null;
+
+        if (!hasComma) throw new CommaAtLastEnumElement(place(lineNo));
+
+        enumElementList.add(new EnumElement(elementName, elementValue, comment));
+
+        comment.clear();
+        return;
+      }
+    }
+    {
+      Matcher matcher = ENUM_ELEMENT2.matcher(line);
+      //noinspection Duplicates
+      if (matcher.matches()) {
+
+        String elementName = matcher.group(1);
+        String elementValue = matcher.group(2);
+        boolean hasComma = matcher.group(3) != null;
+
+        if (!hasComma) throw new CommaAtLastEnumElement(place(lineNo));
+
+        enumElementList.add(new EnumElement(elementName, elementValue, comment));
+
+        comment.clear();
+        return;
+      }
+    }
+  }
+
+  private void parseForClassField(String line, int lineNo) {
     {
       Matcher matcher = STRING_FIELD.matcher(line);
       if (matcher.matches()) {
@@ -354,7 +433,6 @@ public class TsFileReference {
         return;
       }
     }
-
   }
 
   private void registerImport(int lineNo, String className, File importedFile) throws Exception {

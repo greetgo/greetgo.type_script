@@ -26,10 +26,15 @@ public abstract class AbstractResourceDir {
     return destinationFile;
   }
 
+
   private final File sourceDir;
   private final File destinationDir;
 
   public AbstractResourceDir() {
+    this(false);
+  }
+
+  public AbstractResourceDir(boolean fixedDestination) {
     String build = "build";
     String yyyyMMdd_hHmmssSSS = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
     sourceDir = new File(build
@@ -42,8 +47,7 @@ public abstract class AbstractResourceDir {
     destinationDir = new File(build
       + "/"
       + getClass().getSimpleName()
-      + "/"
-      + yyyyMMdd_hHmmssSSS
+      + (fixedDestination ? "" : "/" + yyyyMMdd_hHmmssSSS)
       + "/destination"
     );
   }

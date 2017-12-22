@@ -1,5 +1,6 @@
 package kz.greetgo.ts_java_convert;
 
+import kz.greetgo.ts_java_convert.errors.CommaAtLastEnumElement;
 import kz.greetgo.ts_java_convert.errors.NoFileInImport;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
@@ -28,7 +29,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @SuppressWarnings("RedundantThrows")
-public class ConvertModelTest {
+public class ConvertModel_defineStructure_Test {
   @Test
   public void defineStructure() throws Exception {
 
@@ -383,4 +384,56 @@ public class ConvertModelTest {
     }
   }
 
+  @Test
+  public void defineStructure_someEnum() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File someTestEnumClass = dir.read("sub2/SomeTestEnum.ts");
+
+    TsFileReference someTestEnum = new TsFileReference(someTestEnumClass, "sub2", "SomeTestEnum");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    //
+    //
+    convertModel.defineStructure(singletonList(someTestEnum));
+    //
+    //
+
+    assertThat(someTestEnum.enumElementList.get(0).name).isEqualTo("ELEMENT1");
+    assertThat(someTestEnum.enumElementList.get(0).value).isEqualTo("VALUE1");
+
+    assertThat(someTestEnum.enumElementList.get(1).name).isEqualTo("ELEMENT2");
+    assertThat(someTestEnum.enumElementList.get(1).value).isEqualTo("VALUE2");
+
+    assertThat(someTestEnum.enumElementList.get(2).name).isEqualTo("ELEMENT3");
+    assertThat(someTestEnum.enumElementList.get(2).value).isEqualTo("VALUE3");
+
+    assertThat(someTestEnum.enumElementList).hasSize(3);
+  }
+
+  @DataProvider
+  public Object[][] defineStructure_someEnum_lastElementComma_DP() {
+    return new Object[][]{
+      {"EnumWithoutCommaAtLastElement1"}, {"EnumWithoutCommaAtLastElement2"},
+    };
+  }
+
+  @Test(
+    expectedExceptions = CommaAtLastEnumElement.class,
+    dataProvider = "defineStructure_someEnum_lastElementComma_DP"
+  )
+  public void defineStructure_someEnum_lastElementComma(String name) throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File someTestEnumClass = dir.read("sub2/" + name + ".ts");
+
+    TsFileReference someTestEnum = new TsFileReference(someTestEnumClass, "sub2", name);
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    //
+    //
+    convertModel.defineStructure(singletonList(someTestEnum));
+    //
+    //
+  }
 }

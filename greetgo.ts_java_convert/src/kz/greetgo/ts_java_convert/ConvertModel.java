@@ -2,6 +2,7 @@ package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
+import kz.greetgo.ts_java_convert.stru.EnumElement;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -48,7 +49,7 @@ public class ConvertModel {
     }
   }
 
-  private void generate(ClassStructure classStructure, File destinationDir) throws Exception {
+  void generate(ClassStructure classStructure, File destinationDir) throws Exception {
     Imports imports = new Imports(classStructure);
     StringBuilder body = new StringBuilder();
 
@@ -68,7 +69,16 @@ public class ConvertModel {
 
   private void generateBody(ClassStructure classStructure, Imports imports, StringBuilder body) {
     appendComment(body, classStructure.classComment);
-    body.append("public class ").append(classStructure.name).append(" {\n");
+    String mimeType = classStructure.isEnum() ? "enum" : "class";
+    body.append("public ").append(mimeType).append(" ").append(classStructure.name).append(" {\n");
+
+    for (EnumElement enumElement : classStructure.enumElementList) {
+      appendComment(body, enumElement.comment);
+      body.append("  ").append(enumElement.value).append(",\n");
+    }
+    if (!classStructure.enumElementList.isEmpty()) {
+      body.append("  ;\n");
+    }
 
     for (ClassAttr attr : classStructure.attrList) {
       appendComment(body, attr.comment);

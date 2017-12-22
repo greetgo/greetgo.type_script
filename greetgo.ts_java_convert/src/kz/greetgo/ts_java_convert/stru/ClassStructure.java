@@ -8,6 +8,7 @@ public class ClassStructure extends TypeStructure {
 
   public final String aPackage, name;
   public final List<ClassAttr> attrList;
+  public final List<EnumElement> enumElementList;
   public final List<String> classComment;
 
   public boolean hasPackage() {
@@ -21,16 +22,24 @@ public class ClassStructure extends TypeStructure {
     return fullName;
   }
 
-  public ClassStructure(String aPackage, String name, List<ClassAttr> attrList, List<String> classComment) {
+  public ClassStructure(String aPackage, String name,
+                        List<ClassAttr> attrList,
+                        List<EnumElement> enumElementList,
+                        List<String> classComment) {
     this.aPackage = aPackage;
     this.name = name;
     this.attrList = Collections.unmodifiableList(attrList);
+    this.enumElementList = Collections.unmodifiableList(enumElementList);
     this.classComment = Collections.unmodifiableList(classComment);
+  }
+
+  public boolean isEnum() {
+    return enumElementList.size() > 0;
   }
 
   @Override
   public String toString() {
-    return "CLASS{" + aPackage + '.' + name + '}';
+    return (isEnum() ? "ENUM" : "CLASS") + "{" + aPackage + '.' + name + '}';
   }
 
   public File javaFile(File destinationDir) {
