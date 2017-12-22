@@ -1,5 +1,7 @@
 package kz.greetgo.ts_java_convert;
 
+import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
+import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedLong;
@@ -55,8 +57,20 @@ public class ConvertModelTest {
     assertThat(fr.classStructure.attrList.get(0).type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
   }
 
-  @Test
-  public void defineStructure_stringField() throws Exception {
+  @DataProvider
+  public Object[][] defineStructure_stringField_DP() {
+    return new Object[][]{
+      {"strField", false},
+      {"strOrNullField", false},
+      {"strOrNullField2", false},
+      {"strArrayField", true},
+      {"strArrayOrNullField", true},
+      {"strArrayOrNullField2", true},
+    };
+  }
+
+  @Test(dataProvider = "defineStructure_stringField_DP")
+  public void defineStructure_stringField(String fieldName, boolean isArray) throws Exception {
 
     ConvertModelDir dir = new ConvertModelDir();
     File class1 = dir.read("sub2/ClassWithStringField.ts");
@@ -79,54 +93,33 @@ public class ConvertModelTest {
       .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
 
     {
-      ClassAttr attr = attrMap.get("strField");
+      ClassAttr attr = attrMap.get(fieldName);
       assertThat(attr).isNotNull();
 
       assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isFalse();
-      assertThat(attr.comment).isEqualTo(asList("  /**", "   * string field", "   * line 2 of comment", "   */"));
-    }
-    {
-      ClassAttr attr = attrMap.get("strOrNullField");
-      assertThat(attr).isNotNull();
-
-      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isFalse();
-      assertThat(attr.comment).isEmpty();
-    }
-    {
-      ClassAttr attr = attrMap.get("strOrNullField2");
-      assertThat(attr).isNotNull();
-
-      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isFalse();
+      assertThat(attr.isArray).isEqualTo(isArray);
       assertThat(attr.comment).isEmpty();
     }
 
-    {
-      ClassAttr attr = attrMap.get("strArrayField");
-      assertThat(attr).isNotNull();
+  }
 
-      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isTrue();
-      assertThat(attr.comment).isEmpty();
-    }
-    {
-      ClassAttr attr = attrMap.get("strArrayOrNullField");
-      assertThat(attr).isNotNull();
+  @Test
+  public void defineStructure_checkAllFieldsIn_ClassWithStringField() throws Exception {
 
-      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isTrue();
-      assertThat(attr.comment).isEmpty();
-    }
-    {
-      ClassAttr attr = attrMap.get("strArrayOrNullField2");
-      assertThat(attr).isNotNull();
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/ClassWithStringField.ts");
 
-      assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
-      assertThat(attr.isArray).isTrue();
-      assertThat(attr.comment).isEmpty();
-    }
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithStringField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
 
     List<String> attrNames = fr.classStructure.attrList.stream().map(a -> a.name).collect(toList());
     assertThat(attrNames).containsExactly(
@@ -142,18 +135,19 @@ public class ConvertModelTest {
   @DataProvider
   public Object[][] defineStructure_numberField_DP() {
     return new Object[][]{
-      {"numberIntField", SimpleTypeInt.class, false, true},
-      {"numberIntArrayField1", SimpleTypeInt.class, true, false},
-      {"numberIntArrayField2", SimpleTypeInt.class, true, false},
-      {"numberIntOrNullField1", SimpleTypeBoxedInt.class, false, false},
-      {"numberIntOrNullField2", SimpleTypeBoxedInt.class, false, false},
-      {"numberIntOrNullField3", SimpleTypeBoxedInt.class, false, false},
-      {"numberLongField", SimpleTypeLong.class, false, false},
-      {"numberLongArrayField1", SimpleTypeLong.class, true, false},
-      {"numberLongArrayField2", SimpleTypeLong.class, true, false},
-      {"numberLongOrNullField1", SimpleTypeBoxedLong.class, false, false},
-      {"numberLongOrNullField2", SimpleTypeBoxedLong.class, false, false},
-      {"numberLongOrNullField3", SimpleTypeBoxedLong.class, false, false},
+      {"numberIntField", SimpleTypeInt.class, false},
+      {"numberIntArrayField1", SimpleTypeInt.class, true},
+      {"numberIntArrayField2", SimpleTypeInt.class, true},
+      {"numberIntOrNullField1", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField2", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField3", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField4", SimpleTypeBoxedInt.class, false},
+      {"numberLongField", SimpleTypeLong.class, false},
+      {"numberLongArrayField1", SimpleTypeLong.class, true},
+      {"numberLongArrayField2", SimpleTypeLong.class, true},
+      {"numberLongOrNullField1", SimpleTypeBoxedLong.class, false},
+      {"numberLongOrNullField2", SimpleTypeBoxedLong.class, false},
+      {"numberLongOrNullField3", SimpleTypeBoxedLong.class, false},
 
     };
   }
@@ -161,8 +155,7 @@ public class ConvertModelTest {
   @Test(dataProvider = "defineStructure_numberField_DP")
   public void defineStructure_numberField(String fieldName,
                                           Class<?> fieldClass,
-                                          boolean isArray,
-                                          boolean checkFieldExists) throws Exception {
+                                          boolean isArray) throws Exception {
 
     ConvertModelDir dir = new ConvertModelDir();
     File class1 = dir.read("sub2/ClassWithNumberField.ts");
@@ -185,15 +178,68 @@ public class ConvertModelTest {
       .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
 
     {
+      assertThat(attrMap).containsKey(fieldName);
       ClassAttr attr = attrMap.get(fieldName);
-      assertThat(attr).isNotNull();
 
       assertThat(attr.type.getClass().getName()).isEqualTo(fieldClass.getName());
       assertThat(attr.isArray).isEqualTo(isArray);
       assertThat(attr.comment).isEmpty();
     }
+  }
 
-    if (!checkFieldExists) return;
+  @Test(expectedExceptions = NumberCannotBeMultipleArray.class)
+  public void multipleNumberArray() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/MultipleNumberArray.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "MultipleNumberArray");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+  }
+
+  @Test(expectedExceptions = NoNumberTypeForJava.class)
+  public void noNumberTypeForJava() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/NoNumberTypeForJava.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "NoNumberTypeForJava");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+  }
+
+  @Test
+  public void defineStructure_checkAllFieldsIn_ClassWithNumberField() throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/ClassWithNumberField.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithNumberField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
 
     List<String> attrNames = fr.classStructure.attrList.stream().map(a -> a.name).collect(toList());
     assertThat(attrNames).containsExactly(
@@ -203,12 +249,14 @@ public class ConvertModelTest {
       "numberIntOrNullField1",
       "numberIntOrNullField2",
       "numberIntOrNullField3",
+      "numberIntOrNullField4",
       "numberLongField",
       "numberLongArrayField1",
       "numberLongArrayField2",
       "numberLongOrNullField1",
       "numberLongOrNullField2",
-      "numberLongOrNullField3"
+      "numberLongOrNullField3",
+      "numberLongOrNullField4"
     );
   }
 

@@ -1,6 +1,8 @@
 package kz.greetgo.ts_java_convert;
 
 
+import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
+import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.Import;
@@ -114,9 +116,14 @@ public class TsFileReference {
   private static final Pattern STRING_FIELD2
     = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?;.*");
 
-  //public count: number/*int*/;
-  private static final Pattern NUMBER_FIELD
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*number\\s*(\\|\\s*null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*;.*");
+  private static final Pattern NUMBER_FIELD_array_hasOrAbsent
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*number\\s*(\\[\\s*])?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*;.*");
+
+  private static final Pattern NUMBER_FIELD_null
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*number\\s*(\\|)?\\s*(null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(\\|)?\\s*(null)?\\s*;.*");
+
+  private static final Pattern NUMBER_FIELD_null2
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*number\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*;.*");
 
   //import {OrgUnitKind} from "./org_unit/OrgUnitKind";
   private static final Pattern IMPORT
@@ -144,7 +151,7 @@ public class TsFileReference {
   boolean inComment = false;
 
   private void parseLine(int lineNo, String line) throws Exception {
-    System.out.println("line : " + line);
+//    System.out.println("line : " + line);
 
     if (inComment) {
       inComment = !COMMENT_END.matcher(line).matches();
@@ -216,20 +223,58 @@ public class TsFileReference {
     }
 
     {
-      Matcher matcher = NUMBER_FIELD.matcher(line);
+      Matcher matcher = NUMBER_FIELD_array_hasOrAbsent.matcher(line);
       if (matcher.matches()) {
-        if (matcher.group(3) == null) {
-          throw new RuntimeException("No number type at " + tsFile + ":" + lineNo + "\n" +
-            "  Examples:\n" +
-            "    public fieldName: number /*long*/;\n" +
-            "    public fieldName: number /*int*/;\n" +
-            "    public fieldName: number|null /*long*/;\n" +
-            "    public fieldName: number|null /*int*/;");
-        }
+        String fieldName = matcher.group(1);
+        boolean leftSquareBrackets = matcher.group(2) != null;
+        String strType = matcher.group(4);
+        boolean rightSquareBrackets = matcher.group(5) != null;
+        if (leftSquareBrackets && rightSquareBrackets) throw new NumberCannotBeMultipleArray(place(lineNo));
+        if (strType == null) throw new NoNumberTypeForJava(place(lineNo));
         attrList.add(new ClassAttr(
-          SimpleType.fromStr(matcher.group(4), matcher.group(2) != null, place(lineNo)),
-          matcher.group(1),
-          matcher.group(5) != null,
+          SimpleType.fromStr(strType, false, place(lineNo)),
+          fieldName,
+          leftSquareBrackets || rightSquareBrackets,
+          comment
+        ));
+        comment.clear();
+        return;
+      }
+    }
+
+    {
+      Matcher matcher = NUMBER_FIELD_null.matcher(line);
+      if (matcher.matches()) {
+        String fieldName = matcher.group(1);
+        boolean nullLeft = matcher.group(3) != null;
+        String strType = matcher.group(5);
+        boolean nullRight = matcher.group(7) != null;
+
+        boolean hasNull = nullLeft || nullRight;
+
+        if (strType == null) throw new NoNumberTypeForJava(place(lineNo));
+        attrList.add(new ClassAttr(
+          SimpleType.fromStr(strType, hasNull, place(lineNo)),
+          fieldName,
+          false,
+          comment
+        ));
+        comment.clear();
+        return;
+      }
+    }
+
+    {
+      Matcher matcher = NUMBER_FIELD_null2.matcher(line);
+      if (matcher.matches()) {
+        String fieldName = matcher.group(1);
+        String strType = matcher.group(3);
+
+        if (strType == null) throw new NoNumberTypeForJava(place(lineNo));
+        attrList.add(new ClassAttr(
+          SimpleType.fromStr(strType, true, place(lineNo)),
+          fieldName,
+          false,
           comment
         ));
         comment.clear();
