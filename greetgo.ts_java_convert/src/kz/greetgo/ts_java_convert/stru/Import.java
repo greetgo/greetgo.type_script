@@ -16,7 +16,7 @@ public class Import {
     this.lineNo = lineNo;
   }
 
-  public ClassStructure toClassStru() {
+  public ClassStructure toClassStructure() {
     return Objects.requireNonNull(tsFileReference.classStructure);
   }
 }

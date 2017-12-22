@@ -2,6 +2,9 @@ package kz.greetgo.ts_java_convert;
 
 
 import kz.greetgo.ts_java_convert.errors.BooleanCannotBeMultipleArray;
+import kz.greetgo.ts_java_convert.errors.CannotFindClassInImports;
+import kz.greetgo.ts_java_convert.errors.ClassCannotBeMultipleArray;
+import kz.greetgo.ts_java_convert.errors.NoFileInImport;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
@@ -138,7 +141,7 @@ public class TsFileReference {
 
   //public bArray: OrgUnitRoot|null[];
   private static final Pattern CLASS_FIELD
-    = Pattern.compile("\\s*public\\s*(\\w+)\\s*:\\s*(\\w+)\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;.*");
+    = Pattern.compile("\\s*public\\s*(\\w+)\\s*:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;.*");
 
 
   //public hasChildren: boolean|null[];
@@ -336,13 +339,17 @@ public class TsFileReference {
       Matcher matcher = CLASS_FIELD.matcher(line);
       if (matcher.matches()) {
         String fieldName = matcher.group(1);
-        String className = matcher.group(2);
-        boolean isArray = matcher.group(4) != null;
+        String className = matcher.group(3);
+        boolean isArray1 = matcher.group(4) != null;
+        boolean isArray2 = matcher.group(6) != null;
+
+        if (isArray1 && isArray2) throw new ClassCannotBeMultipleArray(place(lineNo));
+        boolean isArray = isArray1 || isArray2;
 
         Import anImport = importMap.get(className);
-        if (anImport == null) throw new RuntimeException("Cannot find class [[" + className + "]] in " + place(lineNo));
+        if (anImport == null) throw new CannotFindClassInImports(className, place(lineNo));
 
-        attrList.add(new ClassAttr(anImport.toClassStru(), fieldName, isArray, comment));
+        attrList.add(new ClassAttr(anImport.toClassStructure(), fieldName, isArray, comment));
         comment.clear();
         return;
       }
@@ -360,7 +367,7 @@ public class TsFileReference {
     }
 
     if (!importedFile.exists()) {
-      throw new RuntimeException("No file " + importedFile + " in import at " + place(lineNo));
+      throw new NoFileInImport(importedFile, place(lineNo));
     }
 
     TsFileReference ref = tsFile.equals(importedFile) ? this : findTsFileReference(importedFile, lineNo);

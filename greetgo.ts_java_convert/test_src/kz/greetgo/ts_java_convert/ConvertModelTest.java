@@ -1,8 +1,10 @@
 package kz.greetgo.ts_java_convert;
 
+import kz.greetgo.ts_java_convert.errors.NoFileInImport;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
+import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
@@ -273,7 +275,6 @@ public class ConvertModelTest {
       {"boolArrayOrNullField", SimpleTypeBoxedBoolean.class, true},
       {"boolField_null", SimpleTypeBoxedBoolean.class, false},
       {"boolField_null_array", SimpleTypeBoxedBoolean.class, true},
-
     };
   }
 
@@ -308,6 +309,75 @@ public class ConvertModelTest {
       ClassAttr attr = attrMap.get(fieldName);
 
       assertThat(attr.type.getClass().getName()).isEqualTo(fieldClass.getName());
+      assertThat(attr.isArray).isEqualTo(isArray);
+      assertThat(attr.comment).isEmpty();
+    }
+  }
+
+  @Test(expectedExceptions = NoFileInImport.class)
+  public void defineStructure_classField_NoFileInImport() throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/ClassWithClassField.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithClassField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+  }
+
+  @DataProvider
+  public Object[][] defineStructure_classField_DP() {
+    return new Object[][]{
+      {"field", false},
+      {"fieldArray", true},
+      {"fieldNull", false},
+      {"fieldArrayNull1", true},
+      {"fieldArrayNull2", true},
+      {"nullField", false},
+      {"nullFieldArray", true},
+    };
+  }
+
+  @Test(dataProvider = "defineStructure_classField_DP")
+  public void defineStructure_classField(String fieldName,
+                                         boolean isArray) throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir();
+    File anotherClass = dir.read("sub2/AnotherClass.ts");
+    File class1 = dir.read("sub2/ClassWithClassField.ts");
+
+    TsFileReference another = new TsFileReference(anotherClass, "sub2", "AnotherClass");
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithClassField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(asList(fr, another));
+    //
+    //
+
+    assertThat(fr.classStructure).isNotNull();
+
+    Map<String, ClassAttr> attrMap = fr.classStructure
+      .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
+
+    //noinspection Duplicates
+    {
+      assertThat(attrMap).containsKey(fieldName);
+      ClassAttr attr = attrMap.get(fieldName);
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(ClassStructure.class.getName());
       assertThat(attr.isArray).isEqualTo(isArray);
       assertThat(attr.comment).isEmpty();
     }
