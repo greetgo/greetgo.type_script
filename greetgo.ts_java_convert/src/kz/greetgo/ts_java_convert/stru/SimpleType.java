@@ -21,7 +21,7 @@ public abstract class SimpleType extends TypeStructure {
         return boxed ? SimpleTypeBoxedBoolean.get() : SimpleTypeBoolean.get();
 
       default:
-        throw new IllegalArgumentException("Unknown type " + strType + " at " + place);
+        throw new IllegalArgumentException("Unknown type for Java: " + strType + " at " + place);
     }
   }
 

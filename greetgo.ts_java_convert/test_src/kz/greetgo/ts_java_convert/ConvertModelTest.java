@@ -3,6 +3,8 @@ package kz.greetgo.ts_java_convert;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedLong;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeInt;
@@ -177,6 +179,7 @@ public class ConvertModelTest {
     Map<String, ClassAttr> attrMap = fr.classStructure
       .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
 
+    //noinspection Duplicates
     {
       assertThat(attrMap).containsKey(fieldName);
       ClassAttr attr = attrMap.get(fieldName);
@@ -258,6 +261,56 @@ public class ConvertModelTest {
       "numberLongOrNullField3",
       "numberLongOrNullField4"
     );
+  }
+
+
+  @DataProvider
+  public Object[][] defineStructure_boolField_DP() {
+    return new Object[][]{
+      {"boolField", SimpleTypeBoolean.class, false},
+      {"boolOrNullField", SimpleTypeBoxedBoolean.class, false},
+      {"boolArrayField", SimpleTypeBoxedBoolean.class, true},
+      {"boolArrayOrNullField", SimpleTypeBoxedBoolean.class, true},
+      {"boolField_null", SimpleTypeBoxedBoolean.class, false},
+      {"boolField_null_array", SimpleTypeBoxedBoolean.class, true},
+
+    };
+  }
+
+  @Test(dataProvider = "defineStructure_boolField_DP")
+  public void defineStructure_boolField(String fieldName,
+                                        Class<?> fieldClass,
+                                        boolean isArray) throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/ClassWithBooleanField.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithBooleanField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+
+    assertThat(fr.classStructure).isNotNull();
+
+    Map<String, ClassAttr> attrMap = fr.classStructure
+      .attrList.stream().collect(toMap(f -> f.name, Function.identity()));
+
+    //noinspection Duplicates
+    {
+      assertThat(attrMap).containsKey(fieldName);
+      ClassAttr attr = attrMap.get(fieldName);
+
+      assertThat(attr.type.getClass().getName()).isEqualTo(fieldClass.getName());
+      assertThat(attr.isArray).isEqualTo(isArray);
+      assertThat(attr.comment).isEmpty();
+    }
   }
 
 }

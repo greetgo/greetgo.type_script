@@ -1,12 +1,15 @@
 package kz.greetgo.ts_java_convert;
 
 
+import kz.greetgo.ts_java_convert.errors.BooleanCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.Import;
 import kz.greetgo.ts_java_convert.stru.SimpleType;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
 
 import java.io.File;
@@ -140,7 +143,10 @@ public class TsFileReference {
 
   //public hasChildren: boolean|null[];
   private static final Pattern BOOLEAN_FIELD
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*boolean(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;\\s*(#*.*)?");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*boolean\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;.*");
+
+  private static final Pattern BOOLEAN_FIELD_null
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*;.*");
 
   private final Map<String, Import> importMap = new HashMap<>();
   public final List<ClassAttr> attrList = new ArrayList<>();
@@ -286,10 +292,38 @@ public class TsFileReference {
       Matcher matcher = BOOLEAN_FIELD.matcher(line);
       if (matcher.matches()) {
 
+        String fieldName = matcher.group(1);
+        boolean leftArray = matcher.group(2) != null;
+        boolean isNull = matcher.group(3) != null;
+        boolean rightArray = matcher.group(4) != null;
+
+        if (leftArray && rightArray) throw new BooleanCannotBeMultipleArray(place(lineNo));
+
+        boolean boxed = isNull, isArray = leftArray || rightArray;
+        if (isArray) boxed = true;
+
         attrList.add(new ClassAttr(
-          SimpleType.fromStr("boolean", matcher.group(2) != null, place(lineNo)),
-          matcher.group(1),
-          matcher.group(3) != null,
+          boxed ? SimpleTypeBoxedBoolean.get() : SimpleTypeBoolean.get(),
+          fieldName,
+          isArray,
+          comment
+        ));
+
+        comment.clear();
+        return;
+      }
+    }
+    {
+      Matcher matcher = BOOLEAN_FIELD_null.matcher(line);
+      if (matcher.matches()) {
+
+        String fieldName = matcher.group(1);
+        boolean isArray = matcher.group(2) != null;
+
+        attrList.add(new ClassAttr(
+          SimpleTypeBoxedBoolean.get(),
+          fieldName,
+          isArray,
           comment
         ));
 
