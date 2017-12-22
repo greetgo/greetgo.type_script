@@ -15,13 +15,13 @@ public class ConvertModel {
   private final File destinationDir;
   private final String destinationPackage;
 
-  public ConvertModel(File sourceDir, File destinationDir, String destinationPackage) {
+  ConvertModel(File sourceDir, File destinationDir, String destinationPackage) {
     this.sourceDir = sourceDir;
     this.destinationDir = destinationDir;
     this.destinationPackage = destinationPackage;
   }
 
-  public void exec() throws Exception {
+  public void execute() throws Exception {
     List<TsFileReference> files = TsFileReference.scanForTs(sourceDir);
 
     defineStructure(files);

@@ -9,7 +9,7 @@ import static java.util.Arrays.asList;
 
 public class ConvertModel_exec_Test {
   @Test
-  public void test() throws Exception {
+  public void test1() throws Exception {
 
     ConvertModelDir dir = new ConvertModelDir(true);
     File anotherClass = dir.read("sub3/AnotherClass.ts");
@@ -26,6 +26,23 @@ public class ConvertModel_exec_Test {
     convertModel.generate(another.classStructure, dir.destinationDir());
     convertModel.generate(main.classStructure, dir.destinationDir());
     convertModel.generate(someEnum.classStructure, dir.destinationDir());
+
+  }
+
+  @Test
+  public void test2() throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir(true);
+    dir.read("sub3/AnotherClass.ts");
+    dir.read("sub3/MainClass.ts");
+    dir.read("sub3/SomeEnum.ts");
+
+    new ConvertModelBuilder()
+      .sourceDir(dir.sourceDir())
+      .destinationDir(dir.destinationDir())
+      .destinationPackage("kz.greetgo.generations")
+      .create().execute();
+    ;
 
   }
 }
