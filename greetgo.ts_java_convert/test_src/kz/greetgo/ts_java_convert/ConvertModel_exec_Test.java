@@ -41,7 +41,7 @@ public class ConvertModel_exec_Test {
       .sourceDir(dir.sourceDir())
       .destinationDir(dir.destinationDir())
       .destinationPackage("kz.greetgo.generations")
-      .create().execute();
+      .create().execute()
     ;
 
   }
