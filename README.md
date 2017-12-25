@@ -10,7 +10,10 @@
 
 Например имеются файлы:
 
-<small>some/ts/dir/MainClass.ts :</small>
+<table>
+<tr><td>some/ts/dir/MainClass.ts </td>
+<td>
+
 ```typescript
 import {AnotherClass} from "./AnotherClass";
 import {SomeEnum} from "./SomeEnum";
@@ -22,19 +25,31 @@ export class MainClass {
   public enumField: SomeEnum;
 }
 ```
-<small>some/ts/dir/AnotherClass.ts :</small>
+
+<tr><td>
+some/ts/dir/AnotherClass.ts :
+</td><td>
+
 ```typescript
 export class AnotherClass {
   public intField: number/*int*/;
 }
 ```
-<small>some/ts/dir/SomeEnum.ts :</small>
+
+<tr><td>
+some/ts/dir/SomeEnum.ts :
+</td><td>
+
 ```typescript
 export enum SomeEnum {
   FIELD1 = "FIELD1",
   FIELD2 = "FIELD2",
 }
 ```
+
+</td></tr>
+</table>
+
 
 И их нужно преобразовать в следующие классы Java:
 
