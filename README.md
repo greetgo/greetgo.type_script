@@ -11,8 +11,10 @@
 Например имеются файлы:
 
 <table>
-<tr><td>some/ts/dir/MainClass.ts </td>
-<td>
+
+<tr><td>
+some/ts/dir/MainClass.ts
+</td><td>
 
 ```typescript
 import {AnotherClass} from "./AnotherClass";
@@ -26,6 +28,8 @@ export class MainClass {
 }
 ```
 
+</td></tr>
+
 <tr><td>
 some/ts/dir/AnotherClass.ts :
 </td><td>
@@ -35,6 +39,7 @@ export class AnotherClass {
   public intField: number/*int*/;
 }
 ```
+</td></tr>
 
 <tr><td>
 some/ts/dir/SomeEnum.ts :
