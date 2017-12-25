@@ -10,12 +10,7 @@
 
 Например имеются файлы:
 
-<table>
-
-<tr><td>
-some/ts/dir/MainClass.ts
-</td><td>
-
+Файл _some/ts/dir/MainClass.ts :_
 ```typescript
 import {AnotherClass} from "./AnotherClass";
 import {SomeEnum} from "./SomeEnum";
@@ -27,24 +22,13 @@ export class MainClass {
   public enumField: SomeEnum;
 }
 ```
-
-</td></tr>
-
-<tr><td>
-some/ts/dir/AnotherClass.ts :
-</td><td>
-
+Файл _some/ts/dir/AnotherClass.ts :_
 ```typescript
 export class AnotherClass {
   public intField: number/*int*/;
 }
 ```
-</td></tr>
-
-<tr><td>
-some/ts/dir/SomeEnum.ts :
-</td><td>
-
+Файл _some/ts/dir/SomeEnum.ts :_
 ```typescript
 export enum SomeEnum {
   FIELD1 = "FIELD1",
@@ -52,13 +36,10 @@ export enum SomeEnum {
 }
 ```
 
-</td></tr>
-</table>
-
-
 И их нужно преобразовать в следующие классы Java:
 
-<small>java/destination/src/dir/some/package_from/ts/MainClass.java :</small>
+Файл _java/destination/src/dir/some/package_from/ts/MainClass.java :_
+
 ```java
 package some.package_from.ts;
 
@@ -69,7 +50,9 @@ public class MainClass {
   public SomeEnum enumField;
 }
 ```
-<small>java/destination/src/dir/some/package_from/ts/AnotherClass.java :</small>
+
+Файл _java/destination/src/dir/some/package_from/ts/AnotherClass.java :_
+
 ```java
 package some.package_from.ts;
 
@@ -77,7 +60,9 @@ public class AnotherClass {
   public int intField;
 }
 ```
-<small>java/destination/src/dir/some/package_from/ts/SomeEnum.java :</small>
+
+Файл _java/destination/src/dir/some/package_from/ts/SomeEnum.java :_
+
 ```java
 package some.package_from.ts;
 
