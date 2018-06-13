@@ -5,9 +5,13 @@ import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.EnumElement;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 public class ConvertModel {
@@ -49,7 +53,7 @@ public class ConvertModel {
     }
   }
 
-  void generate(ClassStructure classStructure, File destinationDir) throws Exception {
+  File generate(ClassStructure classStructure, File destinationDir) throws Exception {
     Imports imports = new Imports(classStructure);
     StringBuilder body = new StringBuilder();
 
@@ -58,6 +62,13 @@ public class ConvertModel {
     File javaFile = classStructure.javaFile(destinationDir);
     javaFile.getParentFile().mkdirs();
 
+    List<String> leaveFurther = readLeaveFurther(javaFile);
+    if (leaveFurther.isEmpty()) {
+      leaveFurther.add("}");
+    }
+    leaveFurther.add(0, "  //The following code would be not removed after regenerating");
+    leaveFurther.add(1, "  ///LEAVE_FURTHER");
+
     try (PrintStream pr = new PrintStream(javaFile, "UTF-8")) {
       if (classStructure.hasPackage()) pr.println("package " + classStructure.aPackage + ";");
       pr.println();
@@ -65,6 +76,38 @@ public class ConvertModel {
       pr.println();
       pr.println(body);
     }
+
+    return javaFile;
+  }
+
+  static List<String> readLeaveFurther(File javaFile) {
+    if (!javaFile.exists()) return new ArrayList<>();
+    try {
+      return readLeaveFurther(Files.readAllLines(javaFile.toPath(), StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static final Pattern LEAVE_FURTHER = Pattern.compile("\\s*///\\s*LEAVE_FURTHER\\s*");
+
+  static List<String> readLeaveFurther(List<String> javaFileLines) {
+    List<String> ret = new ArrayList<>();
+    boolean adding = false;
+
+    for (String line : javaFileLines) {
+      if (!adding) {
+        if (LEAVE_FURTHER.matcher(line).matches()) {
+          adding = true;
+          continue;
+        }
+        continue;
+      }
+
+      ret.add(line);
+    }
+
+    return ret;
   }
 
   private void generateBody(ClassStructure classStructure, Imports imports, StringBuilder body) {

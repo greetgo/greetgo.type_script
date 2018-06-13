@@ -59,4 +59,8 @@ public abstract class AbstractResourceDir {
   public File destinationDir() {
     return destinationDir;
   }
+
+  public File destinationDir(String dirName) {
+    return destinationDir.getParentFile().toPath().resolve(dirName).toFile();
+  }
 }
