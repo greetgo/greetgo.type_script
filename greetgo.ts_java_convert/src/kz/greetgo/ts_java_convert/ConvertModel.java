@@ -75,6 +75,9 @@ public class ConvertModel {
       pr.println(imports.asStr());
       pr.println();
       pr.println(body);
+      for (String line : leaveFurther) {
+        pr.println(line);
+      }
     }
 
     return javaFile;
@@ -135,7 +138,7 @@ public class ConvertModel {
       body.append(";\n");
     }
 
-    body.append("}");
+//    body.append("}");
   }
 
   private static void appendComment(StringBuilder dest, List<String> comment) {

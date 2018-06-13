@@ -1,6 +1,7 @@
 package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -68,7 +69,7 @@ public class ConvertModelTest {
     ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.test001");
     convertModel.defineStructure(singletonList(class1));
 
-    String destinationDir = "testLeaveFurther_destination";
+    String destinationDir = "testLeaveFurther_destination_" + RND.intStr(10);
 
     //
     //
@@ -84,6 +85,8 @@ public class ConvertModelTest {
       assertBracketPairs(lines);
 
       assertThat(lines.get(lines.size() - 1)).isEqualTo("}");
+
+      assertThat(lines.stream().filter(s -> s.contains("///LEAVE_FURTHER")).count()).isEqualTo(1);
 
       lines.remove(lines.size() - 1);
 
