@@ -3,8 +3,10 @@ package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.SimpleType;
+import kz.greetgo.ts_java_convert.stru.TypeDate;
 import kz.greetgo.ts_java_convert.stru.TypeStructure;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public class Imports {
   }
 
   private String typeName(TypeStructure type, boolean boxed) {
+    if (type == TypeDate.get()) return Date.class.getName();
     if (type instanceof SimpleType) return ((SimpleType) type).javaName(boxed);
     if (type instanceof ClassStructure) return ((ClassStructure) type).fullName();
     throw new IllegalArgumentException("Cannot get name of " + type.getClass());

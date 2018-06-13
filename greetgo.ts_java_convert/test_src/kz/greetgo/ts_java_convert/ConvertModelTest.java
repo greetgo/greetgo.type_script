@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -56,7 +57,6 @@ public class ConvertModelTest {
 
     assertThat(actualLeaveFurther).isEqualTo(expectedLeaveFurther);
   }
-
 
   @Test
   public void testLeaveFurther() throws Exception {
@@ -131,4 +131,29 @@ public class ConvertModelTest {
     assertThat(openCount).isEqualTo(closeCount);
   }
 
+  @Test
+  public void generate_date() throws Exception {
+
+    ConvertModelDir dir = new ConvertModelDir(true);
+    File class1File = dir.read("sub2/ClassWithDateField.ts");
+
+    TsFileReference class1 = new TsFileReference(class1File, "sub2", "ClassWithDateField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.test001");
+    convertModel.defineStructure(singletonList(class1));
+
+    String destinationDir = "generate_date_destination_" + RND.intStr(10);
+
+    //
+    //
+    File javaFile = convertModel.generate(class1.classStructure, dir.destinationDir(destinationDir));
+    //
+    //
+
+    String content = new String(Files.readAllBytes(javaFile.toPath()), UTF_8);
+
+    assertThat(content).contains("import " + Date.class.getName() + ";");
+    assertThat(content).contains("public Date dateField1;");
+    assertThat(content).contains("public Date dateField2;");
+  }
 }
