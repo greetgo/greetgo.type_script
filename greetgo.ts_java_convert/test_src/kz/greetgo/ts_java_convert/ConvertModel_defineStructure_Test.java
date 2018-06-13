@@ -6,6 +6,7 @@ import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
+import kz.greetgo.ts_java_convert.stru.TypeDate;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
@@ -435,5 +436,29 @@ public class ConvertModel_defineStructure_Test {
     convertModel.defineStructure(singletonList(someTestEnum));
     //
     //
+  }
+
+  @Test
+  public void defineStructure_dateField() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File tsClassFile = dir.read("sub2/ClassWithDateField.ts");
+
+    TsFileReference tsFile = new TsFileReference(tsClassFile, "sub2", "ClassWithDateField");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    //
+    //
+    convertModel.defineStructure(singletonList(tsFile));
+    //
+    //
+
+    assertThat(tsFile.classStructure).isNotNull();
+    assertThat(tsFile.classStructure.attrList).hasSize(2);
+    assertThat(tsFile.classStructure.attrList.get(0).name).isEqualTo("dateField1");
+    assertThat(tsFile.classStructure.attrList.get(1).name).isEqualTo("dateField2");
+
+    assertThat(tsFile.classStructure.attrList.get(0).type).isInstanceOf(TypeDate.class);
+    assertThat(tsFile.classStructure.attrList.get(1).type).isInstanceOf(TypeDate.class);
   }
 }

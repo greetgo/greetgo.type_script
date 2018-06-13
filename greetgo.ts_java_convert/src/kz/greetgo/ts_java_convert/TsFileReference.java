@@ -13,6 +13,7 @@ import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.EnumElement;
 import kz.greetgo.ts_java_convert.stru.Import;
 import kz.greetgo.ts_java_convert.stru.SimpleType;
+import kz.greetgo.ts_java_convert.stru.TypeDate;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
@@ -424,6 +425,14 @@ public class TsFileReference {
 
         if (isArray1 && isArray2) throw new ClassCannotBeMultipleArray(place(lineNo));
         boolean isArray = isArray1 || isArray2;
+
+        if ("Date".equals(className)) {
+
+          attrList.add(new ClassAttr(TypeDate.get(), fieldName, isArray, comment));
+          comment.clear();
+
+          return;
+        }
 
         Import anImport = importMap.get(className);
         if (anImport == null) throw new CannotFindClassInImports(className, place(lineNo));
