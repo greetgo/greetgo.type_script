@@ -127,19 +127,19 @@ public class TsFileReference {
 
   //public world: string;
   private static final Pattern STRING_FIELD
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*string\\s*(\\[\\s*]\\s*)?\\s*(\\|\\s*null)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*string\\s*(\\[\\s*]\\s*)?\\s*(\\|\\s*null)?.*(=.*)?;.*");
 
   private static final Pattern STRING_FIELD2
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?.*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_array_hasOrAbsent
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*number\\s*(\\[\\s*])?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\[\\s*])?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_null
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*number\\s*(\\|)?\\s*(null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(\\|)?\\s*(null)?\\s*;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\|)?\\s*(null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(\\|)?\\s*(null)?\\s*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_null2
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*number\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*number\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(=.*)?;.*");
 
   //import {OrgUnitKind} from "./org_unit/OrgUnitKind";
   private static final Pattern IMPORT
@@ -151,15 +151,15 @@ public class TsFileReference {
 
   //public bArray: OrgUnitRoot|null[];
   private static final Pattern CLASS_FIELD
-    = Pattern.compile("\\s*public\\s*(\\w+)\\s*:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;.*");
+    = Pattern.compile("\\s*public\\s*(\\w+)\\s*!?:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
 
   //public hasChildren: boolean|null[];
   private static final Pattern BOOLEAN_FIELD
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*boolean\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*boolean\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
   private static final Pattern BOOLEAN_FIELD_null
-    = Pattern.compile("\\s*public\\s+(\\w+)\\s*:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
   private final Map<String, Import> importMap = new HashMap<>();
   public final List<ClassAttr> attrList = new ArrayList<>();
