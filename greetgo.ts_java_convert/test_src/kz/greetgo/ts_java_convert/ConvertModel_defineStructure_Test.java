@@ -72,6 +72,13 @@ public class ConvertModel_defineStructure_Test {
       {"strArrayField", true},
       {"strArrayOrNullField", true},
       {"strArrayOrNullField2", true},
+      // with init
+      {"strField_init", false},
+      {"strOrNullField_init", false},
+      {"strOrNullField2_init", false},
+      {"strArrayField_init", true},
+      {"strArrayOrNullField_init", true},
+      {"strArrayOrNullField2_init", true},
     };
   }
 
@@ -100,7 +107,7 @@ public class ConvertModel_defineStructure_Test {
 
     {
       ClassAttr attr = attrMap.get(fieldName);
-      assertThat(attr).isNotNull();
+      assertThat(attr).describedAs("Поле оказалось вообще не определённым").isNotNull();
 
       assertThat(attr.type.getClass().getName()).isEqualTo(SimpleTypeStr.class.getName());
       assertThat(attr.isArray).isEqualTo(isArray);
@@ -134,7 +141,14 @@ public class ConvertModel_defineStructure_Test {
       "strOrNullField2",
       "strArrayField",
       "strArrayOrNullField",
-      "strArrayOrNullField2"
+      "strArrayOrNullField2",
+      //with init
+      "strField_init",
+      "strOrNullField_init",
+      "strOrNullField2_init",
+      "strArrayField_init",
+      "strArrayOrNullField_init",
+      "strArrayOrNullField2_init"
     );
   }
 
@@ -154,7 +168,20 @@ public class ConvertModel_defineStructure_Test {
       {"numberLongOrNullField1", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField2", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField3", SimpleTypeBoxedLong.class, false},
-
+      // with init
+      {"numberIntField_init", SimpleTypeInt.class, false},
+      {"numberIntArrayField1_init", SimpleTypeInt.class, true},
+      {"numberIntArrayField2_init", SimpleTypeInt.class, true},
+      {"numberIntOrNullField1_init", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField2_init", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField3_init", SimpleTypeBoxedInt.class, false},
+      {"numberIntOrNullField4_init", SimpleTypeBoxedInt.class, false},
+      {"numberLongField_init", SimpleTypeLong.class, false},
+      {"numberLongArrayField1_init", SimpleTypeLong.class, true},
+      {"numberLongArrayField2_init", SimpleTypeLong.class, true},
+      {"numberLongOrNullField1_init", SimpleTypeBoxedLong.class, false},
+      {"numberLongOrNullField2_init", SimpleTypeBoxedLong.class, false},
+      {"numberLongOrNullField3_init", SimpleTypeBoxedLong.class, false},
     };
   }
 
@@ -212,12 +239,48 @@ public class ConvertModel_defineStructure_Test {
     //
   }
 
+  @Test(expectedExceptions = NumberCannotBeMultipleArray.class)
+  public void multipleNumberArray_withInit() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/MultipleNumberArrayWithInit.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "MultipleNumberArrayWithInit");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+  }
+
   @Test(expectedExceptions = NoNumberTypeForJava.class)
   public void noNumberTypeForJava() throws Exception {
     ConvertModelDir dir = new ConvertModelDir();
     File class1 = dir.read("sub2/NoNumberTypeForJava.ts");
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "NoNumberTypeForJava");
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+
+    assertThat(fr.classStructure).isNull();
+
+    //
+    //
+    convertModel.defineStructure(singletonList(fr));
+    //
+    //
+  }
+
+  @Test(expectedExceptions = NoNumberTypeForJava.class)
+  public void noNumberTypeForJava_withInit() throws Exception {
+    ConvertModelDir dir = new ConvertModelDir();
+    File class1 = dir.read("sub2/NoNumberTypeForJavaWithInit.ts");
+
+    TsFileReference fr = new TsFileReference(class1, "sub2", "NoNumberTypeForJavaWithInit");
 
     ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
 
@@ -263,7 +326,22 @@ public class ConvertModel_defineStructure_Test {
       "numberLongOrNullField1",
       "numberLongOrNullField2",
       "numberLongOrNullField3",
-      "numberLongOrNullField4"
+      "numberLongOrNullField4",
+      // with init
+      "numberIntField_init",
+      "numberIntArrayField1_init",
+      "numberIntArrayField2_init",
+      "numberIntOrNullField1_init",
+      "numberIntOrNullField2_init",
+      "numberIntOrNullField3_init",
+      "numberIntOrNullField4_init",
+      "numberLongField_init",
+      "numberLongArrayField1_init",
+      "numberLongArrayField2_init",
+      "numberLongOrNullField1_init",
+      "numberLongOrNullField2_init",
+      "numberLongOrNullField3_init",
+      "numberLongOrNullField4_init"
     );
   }
 
@@ -277,6 +355,13 @@ public class ConvertModel_defineStructure_Test {
       {"boolArrayOrNullField", SimpleTypeBoxedBoolean.class, true},
       {"boolField_null", SimpleTypeBoxedBoolean.class, false},
       {"boolField_null_array", SimpleTypeBoxedBoolean.class, true},
+      // with init
+      {"boolField_init", SimpleTypeBoolean.class, false},
+      {"boolOrNullField_init", SimpleTypeBoxedBoolean.class, false},
+      {"boolArrayField_init", SimpleTypeBoxedBoolean.class, true},
+      {"boolArrayOrNullField_init", SimpleTypeBoxedBoolean.class, true},
+      {"boolField_null_init", SimpleTypeBoxedBoolean.class, false},
+      {"boolField_null_array_init", SimpleTypeBoxedBoolean.class, true},
     };
   }
 
@@ -345,6 +430,14 @@ public class ConvertModel_defineStructure_Test {
       {"fieldArrayNull2", true},
       {"nullField", false},
       {"nullFieldArray", true},
+      //with init
+      {"field_init", false},
+      {"fieldArray_init", true},
+      {"fieldNull_init", false},
+      {"fieldArrayNull1_init", true},
+      {"fieldArrayNull2_init", true},
+      {"nullField_init", false},
+      {"nullFieldArray_init", true},
     };
   }
 

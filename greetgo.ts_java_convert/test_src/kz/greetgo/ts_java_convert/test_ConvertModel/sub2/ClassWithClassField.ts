@@ -11,4 +11,14 @@ export class ClassWithClassField {
   public nullField: null | AnotherClass;
   public nullFieldArray: null | AnotherClass [];
 
+  //with init
+
+  public field_init!: AnotherClass = null;
+  public fieldArray_init!: AnotherClass[] = null;
+  public fieldNull_init!: AnotherClass | null = null;
+  public fieldArrayNull1_init!: AnotherClass[] | null = null;
+  public fieldArrayNull2_init!: AnotherClass | null [] = null;
+  public nullField_init!: null | AnotherClass = null;
+  public nullFieldArray_init!: null | AnotherClass [] = null;
+
 }
