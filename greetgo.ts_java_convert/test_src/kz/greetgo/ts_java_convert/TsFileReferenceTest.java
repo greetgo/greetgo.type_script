@@ -36,7 +36,5 @@ public class TsFileReferenceTest {
 
     assertThat(map.get("Class2").tsFile).hasContentEqualTo(class2);
     assertThat(map.get("Class2").subPackage).isEqualTo("sub1");
-
-
   }
 }

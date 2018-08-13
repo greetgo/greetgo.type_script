@@ -14,7 +14,6 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -66,7 +65,7 @@ public class ConvertModelTest {
 
     TsFileReference class1 = new TsFileReference(class1File, "sub1", "Class1");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.test001");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.test001");
     convertModel.defineStructure(singletonList(class1));
 
     String destinationDir = "testLeaveFurther_destination_" + RND.intStr(10);
@@ -95,7 +94,7 @@ public class ConvertModelTest {
       lines.add("}");
       lines.add("");
 
-      Files.write(javaFile.toPath(), lines.stream().collect(joining("\n")).getBytes(UTF_8), CREATE);
+      Files.write(javaFile.toPath(), String.join("\n", lines).getBytes(UTF_8), CREATE);
     }
 
     //
@@ -112,7 +111,7 @@ public class ConvertModelTest {
       assertThat(lines.get(lines.size() - 1)).isEqualTo("}");
       assertBracketPairs(lines);
 
-      String content = lines.stream().collect(joining("\n"));
+      String content = String.join("\n", lines);
 
       assertThat(content).contains("public void helloWorldTestMethod() {}");
       assertThat(content).contains("public void byWorldTestMethod() {}");
@@ -123,7 +122,7 @@ public class ConvertModelTest {
 
   private void assertBracketPairs(List<String> lines) {
     int openCount = 0, closeCount = 0;
-    for (char c : lines.stream().collect(joining()).toCharArray()) {
+    for (char c : String.join("", lines).toCharArray()) {
       if (c == '{') openCount++;
       if (c == '}') closeCount++;
     }
@@ -139,7 +138,7 @@ public class ConvertModelTest {
 
     TsFileReference class1 = new TsFileReference(class1File, "sub2", "ClassWithDateField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.test001");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.test001");
     convertModel.defineStructure(singletonList(class1));
 
     String destinationDir = "generate_date_destination_" + RND.intStr(10);

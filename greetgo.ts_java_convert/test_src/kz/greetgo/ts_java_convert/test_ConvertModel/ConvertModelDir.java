@@ -7,5 +7,7 @@ public class ConvertModelDir extends AbstractResourceDir {
     super(fixedDestination);
   }
 
-  public ConvertModelDir() {}
+  public ConvertModelDir() {
+    super(false);
+  }
 }

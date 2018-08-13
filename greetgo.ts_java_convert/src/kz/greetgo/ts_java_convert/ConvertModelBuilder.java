@@ -8,22 +8,26 @@ public class ConvertModelBuilder {
   private File sourceDir = null;
   private File destinationDir = null;
   private String destinationPackage = null;
+  private String scanSubDir;
 
-  public ConvertModelBuilder sourceDir(File sourceDir) {
+  public ConvertModelBuilder sourceDir(File sourceDir, String scanSubDir) {
     Objects.requireNonNull(sourceDir);
     this.sourceDir = sourceDir;
+    this.scanSubDir = scanSubDir;
     return this;
   }
 
-  public ConvertModelBuilder sourceDir(Path sourceDir) {
+  public ConvertModelBuilder sourceDir(Path sourceDir, String scanSubDir) {
     Objects.requireNonNull(sourceDir);
     this.sourceDir = sourceDir.toFile();
+    this.scanSubDir = scanSubDir;
     return this;
   }
 
-  public ConvertModelBuilder sourceDir(String sourceDirName) {
+  public ConvertModelBuilder sourceDir(String sourceDirName, String scanSubDir) {
     Objects.requireNonNull(sourceDirName);
     this.sourceDir = new File(sourceDirName);
+    this.scanSubDir = scanSubDir;
     return this;
   }
 
@@ -60,6 +64,6 @@ public class ConvertModelBuilder {
   public ConvertModel create() {
     if (sourceDir == null) throw new RuntimeException("sourceDir == null: please, define it");
     if (destinationDir == null) throw new RuntimeException("destinationDir == null: please, define it");
-    return new ConvertModel(sourceDir, destinationDir, destinationPackage);
+    return new ConvertModel(sourceDir, scanSubDir, destinationDir, destinationPackage);
   }
 }

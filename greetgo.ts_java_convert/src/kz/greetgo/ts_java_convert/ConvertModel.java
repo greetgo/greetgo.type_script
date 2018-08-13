@@ -16,17 +16,24 @@ import java.util.regex.Pattern;
 
 public class ConvertModel {
   private final File sourceDir;
+  private final File scanDir;
   private final File destinationDir;
   private final String destinationPackage;
 
-  ConvertModel(File sourceDir, File destinationDir, String destinationPackage) {
+  ConvertModel(File sourceDir, String scanSubDir, File destinationDir, String destinationPackage) {
     this.sourceDir = sourceDir;
+    this.scanDir = resolve(sourceDir, scanSubDir);
     this.destinationDir = destinationDir;
     this.destinationPackage = destinationPackage;
   }
 
+  private static File resolve(File sourceDir, String subDir) {
+    if (subDir == null) return sourceDir;
+    return sourceDir.toPath().resolve(subDir).toFile();
+  }
+
   public void execute() throws Exception {
-    List<TsFileReference> files = TsFileReference.scanForTs(sourceDir);
+    List<TsFileReference> files = TsFileReference.scanForTs(scanDir);
 
     defineStructure(files);
 

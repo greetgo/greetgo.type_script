@@ -149,6 +149,10 @@ public class TsFileReference {
   private static final Pattern IMPORT_PARENT
     = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*\"\\.\\./([^\"]*\\w)\"\\s*;.*");
 
+  //import {OrgUnitKind} from "@/org_unit/OrgUnitKind";
+  private static final Pattern IMPORT_SOURCE
+    = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*\"@/([^\"]*\\w)\"\\s*;.*");
+
   //public bArray: OrgUnitRoot|null[];
   private static final Pattern CLASS_FIELD
     = Pattern.compile("\\s*public\\s*(\\w+)\\s*!?:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
@@ -161,7 +165,7 @@ public class TsFileReference {
   private static final Pattern BOOLEAN_FIELD_null
     = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
-  private final Map<String, Import> importMap = new HashMap<>();
+  final Map<String, Import> importMap = new HashMap<>();
   public final List<ClassAttr> attrList = new ArrayList<>();
   public final List<EnumElement> enumElementList = new ArrayList<>();
 
@@ -200,6 +204,17 @@ public class TsFileReference {
       if (matcher.matches()) {
         String className = matcher.group(1);
         File importedFile = tsFile.getParentFile().getParentFile().toPath().resolve(matcher.group(2) + ".ts").toFile();
+
+        registerImport(lineNo, className, importedFile);
+        comment.clear();
+        return;
+      }
+    }
+    {
+      Matcher matcher = IMPORT_SOURCE.matcher(line);
+      if (matcher.matches()) {
+        String className = matcher.group(1);
+        File importedFile = sourceDir.toPath().resolve(matcher.group(2) + ".ts").toFile();
 
         registerImport(lineNo, className, importedFile);
         comment.clear();

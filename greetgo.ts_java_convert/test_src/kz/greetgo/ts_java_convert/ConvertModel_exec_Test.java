@@ -20,7 +20,7 @@ public class ConvertModel_exec_Test {
     TsFileReference main = new TsFileReference(mainClass, "sub3", "MainClass");
     TsFileReference someEnum = new TsFileReference(someEnumClass, "sub3", "SomeEnum");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
     convertModel.defineStructure(asList(main, another, someEnum));
 
     convertModel.generate(another.classStructure, dir.destinationDir());
@@ -38,7 +38,7 @@ public class ConvertModel_exec_Test {
     dir.read("sub3/SomeEnum.ts");
 
     new ConvertModelBuilder()
-      .sourceDir(dir.sourceDir())
+      .sourceDir(dir.sourceDir(), null)
       .destinationDir(dir.destinationDir())
       .destinationPackage("kz.greetgo.generations")
       .create().execute()

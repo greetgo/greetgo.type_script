@@ -6,6 +6,7 @@ import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
 import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
 import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
+import kz.greetgo.ts_java_convert.stru.Import;
 import kz.greetgo.ts_java_convert.stru.TypeDate;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
@@ -15,10 +16,12 @@ import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeLong;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import kz.greetgo.ts_java_convert.test_with_dogs.PathWithDogs;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -39,7 +42,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub1", "Class1");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -90,7 +93,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithStringField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -124,7 +127,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithStringField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -195,7 +198,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithNumberField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -228,7 +231,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "MultipleNumberArray");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -246,7 +249,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "MultipleNumberArrayWithInit");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -264,7 +267,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "NoNumberTypeForJava");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -282,7 +285,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "NoNumberTypeForJavaWithInit");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -301,7 +304,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithNumberField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -375,7 +378,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithBooleanField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -409,7 +412,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithClassField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -452,7 +455,7 @@ public class ConvertModel_defineStructure_Test {
     TsFileReference another = new TsFileReference(anotherClass, "sub2", "AnotherClass");
     TsFileReference fr = new TsFileReference(class1, "sub2", "ClassWithClassField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     assertThat(fr.classStructure).isNull();
 
@@ -485,7 +488,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference someTestEnum = new TsFileReference(someTestEnumClass, "sub2", "SomeTestEnum");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     //
     //
@@ -522,7 +525,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference someTestEnum = new TsFileReference(someTestEnumClass, "sub2", name);
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     //
     //
@@ -538,7 +541,7 @@ public class ConvertModel_defineStructure_Test {
 
     TsFileReference tsFile = new TsFileReference(tsClassFile, "sub2", "ClassWithDateField");
 
-    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), dir.destinationDir(), "kz.greetgo.wow");
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), null, dir.destinationDir(), "kz.greetgo.wow");
 
     //
     //
@@ -553,5 +556,31 @@ public class ConvertModel_defineStructure_Test {
 
     assertThat(tsFile.classStructure.attrList.get(0).type).isInstanceOf(TypeDate.class);
     assertThat(tsFile.classStructure.attrList.get(1).type).isInstanceOf(TypeDate.class);
+  }
+
+  @Test
+  public void defineStructure_pathWithDogs() throws Exception {
+    PathWithDogs dir = new PathWithDogs();
+    dir.read("model/RootModel.ts");
+    dir.read("model/sub1/SubModel1.ts");
+
+    List<TsFileReference> list = TsFileReference.scanForTs(dir.sourceDir());
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), "model", dir.destinationDir(), "kz.greetgo.wow");
+
+    //
+    //
+    convertModel.defineStructure(list);
+    //
+    //
+
+    list.sort(Comparator.comparing(ref -> ref.tsFile.getAbsolutePath()));
+
+    TsFileReference rootModel = list.get(0);
+
+    Import subModel1_import = rootModel.importMap.get("SubModel1");
+    assertThat(subModel1_import).isNotNull();
+    assertThat(subModel1_import.tsFileReference).isNotNull();
+    assertThat(subModel1_import.tsFileReference.className).isEqualTo("SubModel1");
   }
 }
