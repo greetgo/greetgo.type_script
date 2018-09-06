@@ -8,10 +8,15 @@ import kz.greetgo.ts_java_convert.stru.ClassAttr;
 import kz.greetgo.ts_java_convert.stru.ClassStructure;
 import kz.greetgo.ts_java_convert.stru.Import;
 import kz.greetgo.ts_java_convert.stru.TypeDate;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBd;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedDouble;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedFloat;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedLong;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeDouble;
+import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeFloat;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeLong;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
@@ -165,13 +170,16 @@ public class ConvertModel_defineStructure_Test {
       {"numberIntOrNullField2", SimpleTypeBoxedInt.class, false},
       {"numberIntOrNullField3", SimpleTypeBoxedInt.class, false},
       {"numberIntOrNullField4", SimpleTypeBoxedInt.class, false},
+
       {"numberLongField", SimpleTypeLong.class, false},
       {"numberLongArrayField1", SimpleTypeLong.class, true},
       {"numberLongArrayField2", SimpleTypeLong.class, true},
       {"numberLongOrNullField1", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField2", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField3", SimpleTypeBoxedLong.class, false},
+
       // with init
+
       {"numberIntField_init", SimpleTypeInt.class, false},
       {"numberIntArrayField1_init", SimpleTypeInt.class, true},
       {"numberIntArrayField2_init", SimpleTypeInt.class, true},
@@ -179,12 +187,68 @@ public class ConvertModel_defineStructure_Test {
       {"numberIntOrNullField2_init", SimpleTypeBoxedInt.class, false},
       {"numberIntOrNullField3_init", SimpleTypeBoxedInt.class, false},
       {"numberIntOrNullField4_init", SimpleTypeBoxedInt.class, false},
+
       {"numberLongField_init", SimpleTypeLong.class, false},
       {"numberLongArrayField1_init", SimpleTypeLong.class, true},
       {"numberLongArrayField2_init", SimpleTypeLong.class, true},
       {"numberLongOrNullField1_init", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField2_init", SimpleTypeBoxedLong.class, false},
       {"numberLongOrNullField3_init", SimpleTypeBoxedLong.class, false},
+
+      //
+      // DOUBLES
+      //
+
+      {"numberDoubleField", SimpleTypeDouble.class, false},
+      {"numberDoubleArrayField1", SimpleTypeDouble.class, true},
+      {"numberDoubleArrayField2", SimpleTypeDouble.class, true},
+      {"numberDoubleOrNullField1", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField2", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField3", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField4", SimpleTypeBoxedDouble.class, false},
+
+      {"numberFloatField", SimpleTypeFloat.class, false},
+      {"numberFloatArrayField1", SimpleTypeFloat.class, true},
+      {"numberFloatArrayField2", SimpleTypeFloat.class, true},
+      {"numberFloatOrNullField1", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField2", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField3", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField4", SimpleTypeBoxedFloat.class, false},
+
+      {"numberBdField", SimpleTypeBd.class, false},
+      {"numberBdArrayField1", SimpleTypeBd.class, true},
+      {"numberBdArrayField2", SimpleTypeBd.class, true},
+      {"numberBdOrNullField1", SimpleTypeBd.class, false},
+      {"numberBdOrNullField2", SimpleTypeBd.class, false},
+      {"numberBdOrNullField3", SimpleTypeBd.class, false},
+      {"numberBdOrNullField4", SimpleTypeBd.class, false},
+
+      // with init
+
+      {"numberDoubleField_init", SimpleTypeDouble.class, false},
+      {"numberDoubleArrayField1_init", SimpleTypeDouble.class, true},
+      {"numberDoubleArrayField2_init", SimpleTypeDouble.class, true},
+      {"numberDoubleOrNullField1_init", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField2_init", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField3_init", SimpleTypeBoxedDouble.class, false},
+      {"numberDoubleOrNullField4_init", SimpleTypeBoxedDouble.class, false},
+
+      {"numberFloatField_init", SimpleTypeFloat.class, false},
+      {"numberFloatArrayField1_init", SimpleTypeFloat.class, true},
+      {"numberFloatArrayField2_init", SimpleTypeFloat.class, true},
+      {"numberFloatOrNullField1_init", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField2_init", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField3_init", SimpleTypeBoxedFloat.class, false},
+      {"numberFloatOrNullField4_init", SimpleTypeBoxedFloat.class, false},
+
+      {"numberBdField_init", SimpleTypeBd.class, false},
+      {"numberBdArrayField1_init", SimpleTypeBd.class, true},
+      {"numberBdArrayField2_init", SimpleTypeBd.class, true},
+      {"numberBdOrNullField1_init", SimpleTypeBd.class, false},
+      {"numberBdOrNullField2_init", SimpleTypeBd.class, false},
+      {"numberBdOrNullField3_init", SimpleTypeBd.class, false},
+      {"numberBdOrNullField4_init", SimpleTypeBd.class, false},
+
     };
   }
 

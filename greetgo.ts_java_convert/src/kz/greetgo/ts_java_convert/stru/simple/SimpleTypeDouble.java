@@ -3,26 +3,26 @@ package kz.greetgo.ts_java_convert.stru.simple;
 
 import kz.greetgo.ts_java_convert.stru.SimpleType;
 
-public class SimpleTypeInt extends SimpleType {
+public class SimpleTypeDouble extends SimpleType {
   @Override
   public String javaName(boolean boxed) {
-    return boxed ? Integer.class.getSimpleName() : "int";
+    return boxed ? Double.class.getSimpleName() : "double";
   }
 
   private enum Wrapper {
     ELEMENT;
 
-    private final SimpleTypeInt instance = new SimpleTypeInt();
+    private final SimpleTypeDouble instance = new SimpleTypeDouble();
   }
 
-  public static SimpleTypeInt get() {
+  public static SimpleTypeDouble get() {
     return Wrapper.ELEMENT.instance;
   }
 
-  private SimpleTypeInt() {}
+  private SimpleTypeDouble() {}
 
   @Override
   public String toString() {
-    return "INT";
+    return "DOUBLE";
   }
 }

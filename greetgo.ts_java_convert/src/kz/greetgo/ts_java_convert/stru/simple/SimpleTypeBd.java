@@ -3,26 +3,28 @@ package kz.greetgo.ts_java_convert.stru.simple;
 
 import kz.greetgo.ts_java_convert.stru.SimpleType;
 
-public class SimpleTypeInt extends SimpleType {
+import java.math.BigDecimal;
+
+public class SimpleTypeBd extends SimpleType {
   @Override
   public String javaName(boolean boxed) {
-    return boxed ? Integer.class.getSimpleName() : "int";
+    return BigDecimal.class.getSimpleName();
   }
 
   private enum Wrapper {
     ELEMENT;
 
-    private final SimpleTypeInt instance = new SimpleTypeInt();
+    private final SimpleTypeBd instance = new SimpleTypeBd();
   }
 
-  public static SimpleTypeInt get() {
+  public static SimpleTypeBd get() {
     return Wrapper.ELEMENT.instance;
   }
 
-  private SimpleTypeInt() {}
+  private SimpleTypeBd() {}
 
   @Override
   public String toString() {
-    return "INT";
+    return "BIG_DECIMAL";
   }
 }

@@ -31,4 +31,60 @@ export class ClassWithNumberField {
   public numberLongOrNullField2_init!: number | /* long */ null = 123;
   public numberLongOrNullField3_init!: number | null /* long */ = 123;
   public numberLongOrNullField4_init!: null | number /* long */ = 123;
+
+
+  //
+  // DOUBLES
+  //
+
+  public numberDoubleField: number /* double */;
+  public numberDoubleArrayField1: number /* double */ [];
+  public numberDoubleArrayField2: number [] /* double */;
+  public numberDoubleOrNullField1: number /* double */ | null;
+  public numberDoubleOrNullField2: number | /* double */ null;
+  public numberDoubleOrNullField3: number | null /* double */;
+  public numberDoubleOrNullField4: null | number /* double */;
+
+  public numberFloatField: number /* float */;
+  public numberFloatArrayField1: number /* float */ [];
+  public numberFloatArrayField2: number [] /* float */;
+  public numberFloatOrNullField1: number /* float */ | null;
+  public numberFloatOrNullField2: number | /* float */ null;
+  public numberFloatOrNullField3: number | null /* float */;
+  public numberFloatOrNullField4: null | number /* float */;
+
+  public numberBdField: number /* bd */;
+  public numberBdArrayField1: number /* bd */ [];
+  public numberBdArrayField2: number [] /* bd */;
+  public numberBdOrNullField1: number /* bd */ | null;
+  public numberBdOrNullField2: number | /* bd */ null;
+  public numberBdOrNullField3: number | null /* bd */;
+  public numberBdOrNullField4: null | number /* bd */;
+
+  // with init
+
+  public numberDoubleField_init!: number /* double */ = 123.0;
+  public numberDoubleArrayField1_init!: number /* double */ [] = [123.5];
+  public numberDoubleArrayField2_init!: number [] /* double */ = [123.5];
+  public numberDoubleOrNullField1_init!: number /* double */ | null = 123.5;
+  public numberDoubleOrNullField2_init!: number | /* double */ null = 123.5;
+  public numberDoubleOrNullField3_init!: number | null /* double */ = 123.5;
+  public numberDoubleOrNullField4_init!: null | number /* double */ = 123.5;
+
+  public numberFloatField_init!: number /* float */ = 123.5;
+  public numberFloatArrayField1_init!: number /* float */ [] = [123.3];
+  public numberFloatArrayField2_init!: number [] /* float */ = [123.3];
+  public numberFloatOrNullField1_init!: number /* float */ | null = 123.3;
+  public numberFloatOrNullField2_init!: number | /* float */ null = 123.3;
+  public numberFloatOrNullField3_init!: number | null /* float */ = 123.3;
+  public numberFloatOrNullField4_init!: null | number /* float */ = 123.3;
+
+  public numberBdField_init!: number /* bd */ = 123.5;
+  public numberBdArrayField1_init!: number /* bd */ [] = [123.3];
+  public numberBdArrayField2_init!: number [] /* bd */ = [123.3];
+  public numberBdOrNullField1_init!: number /* bd */ | null = 123.3;
+  public numberBdOrNullField2_init!: number | /* bd */ null = 123.3;
+  public numberBdOrNullField3_init!: number | null /* bd */ = 123.3;
+  public numberBdOrNullField4_init!: null | number /* bd */ = 123.3;
+
 }
