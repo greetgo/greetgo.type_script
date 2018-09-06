@@ -36,6 +36,7 @@ public class ConvertModel_exec_Test {
     dir.read("sub3/AnotherClass.ts");
     dir.read("sub3/MainClass.ts");
     dir.read("sub3/SomeEnum.ts");
+    dir.read("sub2/ClassWithNumberField.ts");
 
     new ConvertModelBuilder()
       .sourceDir(dir.sourceDir(), null)
@@ -44,5 +45,11 @@ public class ConvertModel_exec_Test {
       .create().execute()
     ;
 
+    System.out.println();
+    System.out.println("--- --- ");
+    System.out.println("--- --- ");
+    System.out.println("--- --- dir.destinationDir() = " + dir.destinationDir());
+    System.out.println("--- --- ");
+    System.out.println("--- --- ");
   }
 }
