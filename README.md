@@ -4,7 +4,7 @@
 
 ### Подключение через Maven Central
 
-    testCompile "kz.greetgo.type_script:greetgo.ts_java_convert:0.0.2"
+    testCompile "kz.greetgo.type_script:greetgo.ts_java_convert:0.0.6"
 
 ### Что делает и как использовать
 
