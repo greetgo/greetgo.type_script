@@ -379,6 +379,7 @@ public class ConvertModel_defineStructure_Test {
     //
 
     List<String> attrNames = fr.classStructure.attrList.stream().map(a -> a.name).collect(toList());
+
     assertThat(attrNames).containsExactly(
       "numberIntField",
       "numberIntArrayField1",
@@ -394,7 +395,6 @@ public class ConvertModel_defineStructure_Test {
       "numberLongOrNullField2",
       "numberLongOrNullField3",
       "numberLongOrNullField4",
-      // with init
       "numberIntField_init",
       "numberIntArrayField1_init",
       "numberIntArrayField2_init",
@@ -408,7 +408,49 @@ public class ConvertModel_defineStructure_Test {
       "numberLongOrNullField1_init",
       "numberLongOrNullField2_init",
       "numberLongOrNullField3_init",
-      "numberLongOrNullField4_init"
+      "numberLongOrNullField4_init",
+      "numberDoubleField",
+      "numberDoubleArrayField1",
+      "numberDoubleArrayField2",
+      "numberDoubleOrNullField1",
+      "numberDoubleOrNullField2",
+      "numberDoubleOrNullField3",
+      "numberDoubleOrNullField4",
+      "numberFloatField",
+      "numberFloatArrayField1",
+      "numberFloatArrayField2",
+      "numberFloatOrNullField1",
+      "numberFloatOrNullField2",
+      "numberFloatOrNullField3",
+      "numberFloatOrNullField4",
+      "numberBdField",
+      "numberBdArrayField1",
+      "numberBdArrayField2",
+      "numberBdOrNullField1",
+      "numberBdOrNullField2",
+      "numberBdOrNullField3",
+      "numberBdOrNullField4",
+      "numberDoubleField_init",
+      "numberDoubleArrayField1_init",
+      "numberDoubleArrayField2_init",
+      "numberDoubleOrNullField1_init",
+      "numberDoubleOrNullField2_init",
+      "numberDoubleOrNullField3_init",
+      "numberDoubleOrNullField4_init",
+      "numberFloatField_init",
+      "numberFloatArrayField1_init",
+      "numberFloatArrayField2_init",
+      "numberFloatOrNullField1_init",
+      "numberFloatOrNullField2_init",
+      "numberFloatOrNullField3_init",
+      "numberFloatOrNullField4_init",
+      "numberBdField_init",
+      "numberBdArrayField1_init",
+      "numberBdArrayField2_init",
+      "numberBdOrNullField1_init",
+      "numberBdOrNullField2_init",
+      "numberBdOrNullField3_init",
+      "numberBdOrNullField4_init"
     );
   }
 

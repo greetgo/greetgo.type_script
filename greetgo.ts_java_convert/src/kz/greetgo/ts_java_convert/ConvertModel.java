@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -19,6 +20,7 @@ public class ConvertModel {
   private final File scanDir;
   private final File destinationDir;
   private final String destinationPackage;
+  public boolean addingDefaultConstructor;
 
   ConvertModel(File sourceDir, String scanSubDir, File destinationDir, String destinationPackage) {
     this.sourceDir = sourceDir;
@@ -28,7 +30,7 @@ public class ConvertModel {
   }
 
   private static File resolve(File sourceDir, String subDir) {
-    if (subDir == null) return sourceDir;
+    if (subDir == null) { return sourceDir; }
     return sourceDir.toPath().resolve(subDir).toFile();
   }
 
@@ -76,12 +78,24 @@ public class ConvertModel {
     leaveFurther.add(0, "  //The following code would be not removed after regenerating");
     leaveFurther.add(1, "  ///LEAVE_FURTHER");
 
+    boolean addDefaultConstructor = false;
+
+    if (addingDefaultConstructor) {
+      addDefaultConstructor = !hasDefaultConstructor(leaveFurther, classStructure.name);
+    }
+
     try (PrintStream pr = new PrintStream(javaFile, "UTF-8")) {
-      if (classStructure.hasPackage()) pr.println("package " + classStructure.aPackage + ";");
+      if (classStructure.hasPackage()) { pr.println("package " + classStructure.aPackage + ";"); }
       pr.println();
       pr.println(imports.asStr());
       pr.println();
       pr.println(body);
+
+      if (addDefaultConstructor) {
+        addDefaultConstructor(pr, classStructure.name);
+        pr.println();
+      }
+
       for (String line : leaveFurther) {
         pr.println(line);
       }
@@ -90,8 +104,18 @@ public class ConvertModel {
     return javaFile;
   }
 
+  private void addDefaultConstructor(PrintStream pr, String name) {
+    pr.println("  public " + name + "() {}");
+  }
+
+  private boolean hasDefaultConstructor(List<String> leaveFurther, String name) {
+    Pattern pattern = Pattern.compile(name + "\\s*\\(\\s*\\)\\s*\\{");
+    Matcher matcher = pattern.matcher(String.join("\n", leaveFurther));
+    return matcher.find();
+  }
+
   static List<String> readLeaveFurther(File javaFile) {
-    if (!javaFile.exists()) return new ArrayList<>();
+    if (!javaFile.exists()) { return new ArrayList<>(); }
     try {
       return readLeaveFurther(Files.readAllLines(javaFile.toPath(), StandardCharsets.UTF_8));
     } catch (IOException e) {
@@ -145,11 +169,11 @@ public class ConvertModel {
       body.append(";\n");
     }
 
-//    body.append("}");
+    //    body.append("}");
   }
 
   private static void appendComment(StringBuilder dest, List<String> comment) {
-    if (comment == null) return;
+    if (comment == null) { return; }
     for (String line : comment) {
       dest.append(line).append('\n');
     }

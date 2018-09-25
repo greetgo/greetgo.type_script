@@ -85,6 +85,7 @@ public class SomeLauncher {
         .sourceDir("some/ts/dir")
         .destinationDir("java/destination/src")
         .destinationPackage("some.package_from.ts")
+        .setAddingDefaultConstructor(true)
         .create().execute();
   }
 
