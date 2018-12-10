@@ -12,7 +12,9 @@ import java.util.Date;
 public abstract class AbstractResourceDir {
   public File read(String resourceName) {
     InputStream inputStream = getClass().getResourceAsStream(resourceName);
-    if (inputStream == null) throw new IllegalArgumentException("No resource " + resourceName);
+    if (inputStream == null) {
+      throw new IllegalArgumentException("No resource " + resourceName);
+    }
     File destinationFile = sourceDir.toPath().resolve(resourceName).toFile();
     destinationFile.getParentFile().mkdirs();
     try {
@@ -38,17 +40,17 @@ public abstract class AbstractResourceDir {
     String build = "build";
     String yyyyMMdd_hHmmssSSS = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
     sourceDir = new File(build
-      + "/"
-      + getClass().getSimpleName()
-      + "/"
-      + yyyyMMdd_hHmmssSSS
-      + "/source"
+        + "/test_data/"
+        + getClass().getSimpleName()
+        + "/"
+        + yyyyMMdd_hHmmssSSS
+        + "/source"
     );
     destinationDir = new File(build
-      + "/"
-      + getClass().getSimpleName()
-      + (fixedDestination ? "" : "/" + yyyyMMdd_hHmmssSSS)
-      + "/destination"
+        + "/test_data/"
+        + getClass().getSimpleName()
+        + (fixedDestination ? "" : "/" + yyyyMMdd_hHmmssSSS)
+        + "/destination"
     );
   }
 

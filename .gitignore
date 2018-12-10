@@ -30,3 +30,7 @@ Thumbs.db
 *.sqlite
 classes/
 /.shelf/
+
+# Another #
+###########
+.attach_pid*

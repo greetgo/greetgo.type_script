@@ -1,6 +1,7 @@
 package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import kz.greetgo.ts_java_convert.test_bpm_manager.PathWithBpmManager;
 import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
 
@@ -28,22 +29,22 @@ public class ConvertModelTest {
   @Test
   public void readLeaveFurther() {
     String content = "package kz.greetgo.wow.sub3;\n" +
-      "\n" +
-      "\n" +
-      "public class AnotherClass {\n" +
-      "  public int intField;\n" +
-      "\n" +
-      "  //The following code would be not removed after regenerating\n" +
-      "  ///LEAVE_FURTHER\n" +
-      "\n" +
-      "  public void asd() {}\n" +
-      "\n" +
-      "}\n";
+        "\n" +
+        "\n" +
+        "public class AnotherClass {\n" +
+        "  public int intField;\n" +
+        "\n" +
+        "  //The following code would be not removed after regenerating\n" +
+        "  ///LEAVE_FURTHER\n" +
+        "\n" +
+        "  public void asd() {}\n" +
+        "\n" +
+        "}\n";
 
     //
     //
     List<String> actualLeaveFurther = ConvertModel.readLeaveFurther(
-      Arrays.stream(content.split("\n")).collect(toList())
+        Arrays.stream(content.split("\n")).collect(toList())
     );
     //
     //
@@ -123,8 +124,8 @@ public class ConvertModelTest {
   private void assertBracketPairs(List<String> lines) {
     int openCount = 0, closeCount = 0;
     for (char c : String.join("", lines).toCharArray()) {
-      if (c == '{') openCount++;
-      if (c == '}') closeCount++;
+      if (c == '{') { openCount++; }
+      if (c == '}') { closeCount++; }
     }
 
     assertThat(openCount).isEqualTo(closeCount);
@@ -154,5 +155,24 @@ public class ConvertModelTest {
     assertThat(content).contains("import " + Date.class.getName() + ";");
     assertThat(content).contains("public Date dateField1;");
     assertThat(content).contains("public Date dateField2;");
+  }
+
+  @Test
+  public void test_ConvertModelBuilder_with_BpmManager() throws Exception {
+    PathWithBpmManager dir = new PathWithBpmManager();
+    dir.read("model/BpmListRow.ts");
+    dir.read("model/bpm/manager/BpmManagerContent.ts");
+    dir.read("model/bpm/manager/BpmRecord.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "kz.greetgo.bpm.models";
+
+    new ConvertModelBuilder()
+        .sourceDir(sourceDir, "model")
+        .destinationDir(destinationDir)
+        .destinationPackage(destinationPackage)
+        .create()
+        .execute();
   }
 }
