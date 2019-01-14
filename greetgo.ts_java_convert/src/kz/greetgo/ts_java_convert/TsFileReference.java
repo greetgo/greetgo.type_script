@@ -149,7 +149,7 @@ public class TsFileReference {
 
   //import {OrgUnitKind} from "../org_unit/OrgUnitKind";
   private static final Pattern IMPORT_PARENT
-      = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*\"\\.\\./([^\"]*\\w)\"\\s*;.*");
+      = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*[\"']\\.\\./([^\"']*\\w)[\"']\\s*;.*");
 
   //import {OrgUnitKind} from "@/org_unit/OrgUnitKind";
   private static final Pattern IMPORT_SOURCE

@@ -21,6 +21,7 @@ import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeInt;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeLong;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import kz.greetgo.ts_java_convert.test_deep_parents.PathDeepParents;
 import kz.greetgo.ts_java_convert.test_with_dogs.PathWithDogs;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -37,7 +38,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-@SuppressWarnings("RedundantThrows")
 public class ConvertModel_defineStructure_Test {
   @Test
   public void defineStructure() throws Exception {
@@ -688,5 +688,31 @@ public class ConvertModel_defineStructure_Test {
     assertThat(subModel1_import).isNotNull();
     assertThat(subModel1_import.tsFileReference).isNotNull();
     assertThat(subModel1_import.tsFileReference.className).isEqualTo("SubModel1");
+  }
+
+  @Test
+  public void defineStructure_PathDeepParents() throws Exception {
+    PathDeepParents dir = new PathDeepParents();
+    dir.read("model/one/two/three/four/five/Model2.ts");
+    dir.read("model/red/green/blue/white/yellow/Model1.ts");
+
+    List<TsFileReference> list = TsFileReference.scanForTs(dir.sourceDir());
+
+    ConvertModel convertModel = new ConvertModel(dir.sourceDir(), "model", dir.destinationDir(), "kz.greetgo.wow");
+
+    //
+    //
+    convertModel.defineStructure(list);
+    //
+    //
+
+    list.sort(Comparator.comparing(ref -> ref.tsFile.getName()));
+
+    TsFileReference model1 = list.get(0);
+
+    Import subModel2_import = model1.importMap.get("Model2");
+    assertThat(subModel2_import).isNotNull();
+    assertThat(subModel2_import.tsFileReference).isNotNull();
+    assertThat(subModel2_import.tsFileReference.className).isEqualTo("Model2");
   }
 }
