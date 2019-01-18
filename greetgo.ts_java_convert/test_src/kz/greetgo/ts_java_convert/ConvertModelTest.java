@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -29,22 +30,22 @@ public class ConvertModelTest {
   @Test
   public void readLeaveFurther() {
     String content = "package kz.greetgo.wow.sub3;\n" +
-        "\n" +
-        "\n" +
-        "public class AnotherClass {\n" +
-        "  public int intField;\n" +
-        "\n" +
-        "  //The following code would be not removed after regenerating\n" +
-        "  ///LEAVE_FURTHER\n" +
-        "\n" +
-        "  public void asd() {}\n" +
-        "\n" +
-        "}\n";
+      "\n" +
+      "\n" +
+      "public class AnotherClass {\n" +
+      "  public int intField;\n" +
+      "\n" +
+      "  //The following code would be not removed after regenerating\n" +
+      "  ///LEAVE_FURTHER\n" +
+      "\n" +
+      "  public void asd() {}\n" +
+      "\n" +
+      "}\n";
 
     //
     //
     List<String> actualLeaveFurther = ConvertModel.readLeaveFurther(
-        Arrays.stream(content.split("\n")).collect(toList())
+      Arrays.stream(content.split("\n")).collect(toList())
     );
     //
     //
@@ -124,8 +125,12 @@ public class ConvertModelTest {
   private void assertBracketPairs(List<String> lines) {
     int openCount = 0, closeCount = 0;
     for (char c : String.join("", lines).toCharArray()) {
-      if (c == '{') { openCount++; }
-      if (c == '}') { closeCount++; }
+      if (c == '{') {
+        openCount++;
+      }
+      if (c == '}') {
+        closeCount++;
+      }
     }
 
     assertThat(openCount).isEqualTo(closeCount);
@@ -168,11 +173,28 @@ public class ConvertModelTest {
     File destinationDir = dir.destinationDir();
     String destinationPackage = "kz.greetgo.bpm.models";
 
-    new ConvertModelBuilder()
-        .sourceDir(sourceDir, "model")
-        .destinationDir(destinationDir)
-        .destinationPackage(destinationPackage)
-        .create()
-        .execute();
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
+
+    Path javaFile = dir.destinationDir().toPath().resolve("kz/greetgo/bpm/models/BpmListRow.java");
+
+    List<String> lines = Files.readAllLines(javaFile);
+
+    lines.set(2, "import asd.asd.Wow;");
+
+    Files.write(javaFile, lines);
+
+    assertThat(lines.get(2)).isEqualTo("import asd.asd.Wow;");
+
+    convertModel.execute();
+
+    lines = Files.readAllLines(javaFile);
+
+    assertThat(lines.get(2)).isEqualTo("import asd.asd.Wow;");
   }
 }

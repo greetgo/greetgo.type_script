@@ -78,6 +78,8 @@ public class ConvertModel {
     leaveFurther.add(0, "  //The following code would be not removed after regenerating");
     leaveFurther.add(1, "  ///LEAVE_FURTHER");
 
+    imports.readImportsFromJava(javaFile);
+
     boolean addDefaultConstructor = false;
 
     if (addingDefaultConstructor) {
