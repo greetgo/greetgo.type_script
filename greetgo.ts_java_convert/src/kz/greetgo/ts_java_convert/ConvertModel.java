@@ -96,7 +96,7 @@ public class ConvertModel {
         pr.println("package " + classStructure.aPackage + ";");
       }
       pr.println();
-      pr.println(imports.asStr());
+      pr.println(imports.printForPackage(classStructure.aPackage));
       pr.println();
       pr.println(body);
 

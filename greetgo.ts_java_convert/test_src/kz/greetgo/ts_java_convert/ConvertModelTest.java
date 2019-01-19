@@ -244,7 +244,7 @@ public class ConvertModelTest {
   @Test
   public void test_ConvertModelBuilder_extends() throws Exception {
     PathWithBpmManager dir = new PathWithBpmManager();
-    dir.read("model2/BaseClass.ts");
+    dir.read("model2/base/BaseClass.ts");
     dir.read("model2/ChildClass0.ts");
     dir.read("model2/ChildClass1.ts");
     dir.read("model2/ChildClass2.ts");
@@ -273,7 +273,7 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass0 extends BaseClass");
-      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.base.BaseClass;");
     }
     {
       Path javaFile = packageDir.resolve("ChildClass1.java");
@@ -281,7 +281,7 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass1 extends BaseClass");
-      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.base.BaseClass;");
     }
     {
       Path javaFile = packageDir.resolve("ChildClass2.java");
@@ -289,10 +289,44 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass2 extends BaseClass");
-      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.base.BaseClass;");
     }
 
     assertThat(packageDir.resolve("OnlyInterfaceClass1.java").toFile()).exists();
     assertThat(packageDir.resolve("OnlyInterfaceClass2.java").toFile()).exists();
+  }
+
+  @Test
+  public void test_ConvertModelBuilder_importInSamePackageDoNotPrint() throws Exception {
+    PathWithBpmManager dir = new PathWithBpmManager();
+    dir.read("model3/working_package/MainClass.ts");
+    dir.read("model3/working_package/RefInSamePackage.ts");
+    dir.read("model3/working_package/sub_package/RefInSubPackage.ts");
+    dir.read("model3/RefInParentPackage.ts");
+    dir.read("model3/parallel_package/RefInParallelPackage.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "kz.greetgo.bpm3";
+
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model3")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
+
+    Path packageDir = dir.destinationDir().toPath().resolve("kz/greetgo/bpm3/working_package/");
+
+    Path javaFile = packageDir.resolve("MainClass.java");
+
+    String javaContent = String.join("\n", Files.readAllLines(javaFile));
+
+    assertThat(javaContent).contains("import kz.greetgo.bpm3.RefInParentPackage;");
+    assertThat(javaContent).contains("import kz.greetgo.bpm3.parallel_package.RefInParallelPackage;");
+    assertThat(javaContent).contains("import kz.greetgo.bpm3.working_package.sub_package.RefInSubPackage;");
+
+    assertThat(javaContent).doesNotContain("import kz.greetgo.bpm3.working_package.RefInSamePackage;");
   }
 }

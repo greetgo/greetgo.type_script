@@ -1,4 +1,4 @@
-import {BaseClass} from "./BaseClass";
+import {BaseClass} from "./base/BaseClass";
 import {SuperTestInterface1} from "../out_of_model/SuperTestInterface1";
 import {SuperTestInterface2} from "../out_of_model/SuperTestInterface2";
 

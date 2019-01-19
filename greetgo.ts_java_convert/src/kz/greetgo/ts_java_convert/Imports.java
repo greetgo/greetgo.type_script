@@ -9,10 +9,7 @@ import kz.greetgo.ts_java_convert.stru.TypeStructure;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,12 +49,25 @@ public class Imports {
 
   private static final String LIST_NAME = List.class.getName();
 
-  public String asStr() {
-    return fullNameMap.entrySet().stream()
-      .map(e -> "import " + e.getValue() + ";")
+  public String printForPackage(String aPackage) {
+    return fullNameMap.values().stream()
+      .filter(Objects::nonNull)
+      .filter(value -> !Objects.equals(extractPackage(value), aPackage))
+      .map(value -> "import " + value + ";")
       .sorted()
       .collect(Collectors.joining("\n"))
       ;
+  }
+
+  private static String extractPackage(String fullClassName) {
+    if (fullClassName == null) {
+      return null;
+    }
+    int index = fullClassName.lastIndexOf('.');
+    if (index < 0) {
+      return null;
+    }
+    return fullClassName.substring(0, index);
   }
 
   public String typeStr(TypeStructure type, boolean isArray) {
