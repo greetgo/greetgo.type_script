@@ -158,7 +158,13 @@ public class ConvertModel {
   private void generateBody(ClassStructure classStructure, Imports imports, StringBuilder body) {
     appendComment(body, classStructure.classComment);
     String mimeType = classStructure.isEnum() ? "enum" : "class";
-    body.append("public ").append(mimeType).append(" ").append(classStructure.name).append(" {\n");
+    body.append("public ").append(mimeType).append(" ").append(classStructure.name);
+
+    if (classStructure.extend != null) {
+      body.append(" extends ").append(imports.typeStr(classStructure.extend, false));
+    }
+
+    body.append(" {\n");
 
     for (EnumElement enumElement : classStructure.enumElementList) {
       appendComment(body, enumElement.comment);

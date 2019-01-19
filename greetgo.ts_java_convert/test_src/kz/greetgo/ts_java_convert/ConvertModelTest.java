@@ -167,7 +167,6 @@ public class ConvertModelTest {
   public void test_ConvertModelBuilder_with_BpmManager() throws Exception {
     PathWithBpmManager dir = new PathWithBpmManager();
     dir.read("model/BpmListRow.ts");
-    dir.read("model/createEmptyBpmListRow.ts");
     dir.read("model/bpm/manager/BpmManagerContent.ts");
     dir.read("model/bpm/manager/BpmRecord.ts");
 
@@ -274,6 +273,7 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass0 extends BaseClass");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
     }
     {
       Path javaFile = packageDir.resolve("ChildClass1.java");
@@ -281,6 +281,7 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass1 extends BaseClass");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
     }
     {
       Path javaFile = packageDir.resolve("ChildClass2.java");
@@ -288,6 +289,7 @@ public class ConvertModelTest {
       String javaContent = String.join("\n", Files.readAllLines(javaFile));
 
       assertThat(javaContent).contains("class ChildClass2 extends BaseClass");
+      assertThat(javaContent).contains("import kz.greetgo.bpm.models2.BaseClass;");
     }
 
     assertThat(packageDir.resolve("OnlyInterfaceClass1.java").toFile()).exists();

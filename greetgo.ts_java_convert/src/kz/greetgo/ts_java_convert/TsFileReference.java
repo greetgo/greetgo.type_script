@@ -1,8 +1,8 @@
 package kz.greetgo.ts_java_convert;
 
 
-import kz.greetgo.ts_java_convert.definitions.ClassDefinition;
 import kz.greetgo.ts_java_convert.errors.*;
+import kz.greetgo.ts_java_convert.matchings.ClassMatching;
 import kz.greetgo.ts_java_convert.stru.*;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
@@ -234,17 +234,24 @@ public class TsFileReference {
 
 
     {
-      ClassDefinition classDefinition = ClassDefinition.match(line);
-      if (classDefinition != null) {
+      ClassMatching classMatching = ClassMatching.match(line);
+      if (classMatching != null) {
         if (wasEnumDefinition) {
           throw new RuntimeException("You cannot define enum and class in one file: " + place(lineNo));
         }
-        String lineClassName = classDefinition.lineClassName;
+        String lineClassName = classMatching.lineClassName;
         registerImport(lineNo, lineClassName, tsFile);
         if (lineClassName.equals(className)) {
           wasClassDefinition = true;
           classComment.addAll(comment);
           comment.clear();
+          if (classMatching.extend != null) {
+            Import anImport = importMap.get(classMatching.extend);
+            if (anImport != null) {
+              classStructure.extend = anImport.toClassStructure();
+            }
+
+          }
           return;
         }
         comment.clear();
@@ -515,17 +522,13 @@ public class TsFileReference {
     }
   }
 
-  private TsFileReference findTsFileReference(File importedFile, int lineNo) throws IOException {
+  private TsFileReference findTsFileReference(File importedFile, @SuppressWarnings("unused") int lineNo) throws IOException {
     File canonicalFile = importedFile.getCanonicalFile();
 
     for (TsFileReference anotherFile : anotherFiles) {
       if (canonicalFile.equals(anotherFile.tsFile.getCanonicalFile())) {
         return anotherFile;
       }
-    }
-
-    if (ConvertModelUtil.isParent(sourceDir, importedFile)) {
-      throw new RuntimeException("Cannot find " + importedFile + " at " + place(lineNo));
     }
 
     return null;

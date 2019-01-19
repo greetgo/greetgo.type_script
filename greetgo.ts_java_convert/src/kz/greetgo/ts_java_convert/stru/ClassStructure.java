@@ -11,6 +11,8 @@ public class ClassStructure extends TypeStructure {
   public final List<EnumElement> enumElementList;
   public final List<String> classComment;
 
+  public ClassStructure extend = null;
+
   public boolean hasPackage() {
     return aPackage != null && aPackage.length() > 0;
   }
