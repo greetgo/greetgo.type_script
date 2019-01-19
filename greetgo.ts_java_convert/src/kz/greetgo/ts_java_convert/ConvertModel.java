@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class ConvertModel {
@@ -30,14 +31,16 @@ public class ConvertModel {
   }
 
   private static File resolve(File sourceDir, String subDir) {
-    if (subDir == null) { return sourceDir; }
+    if (subDir == null) {
+      return sourceDir;
+    }
     return sourceDir.toPath().resolve(subDir).toFile();
   }
 
   public void execute() throws Exception {
     List<TsFileReference> files = TsFileReference.scanForTs(scanDir);
 
-    defineStructure(files);
+    files = defineStructure(files);
 
     for (TsFileReference file : files) {
       System.out.println(file);
@@ -49,7 +52,7 @@ public class ConvertModel {
     }
   }
 
-  void defineStructure(List<TsFileReference> files) throws Exception {
+  List<TsFileReference> defineStructure(List<TsFileReference> files) throws Exception {
     for (TsFileReference file : files) {
       file.anotherFiles = ConvertModelUtil.deleteIt(file, files);
       file.sourceDir = sourceDir;
@@ -60,6 +63,8 @@ public class ConvertModel {
     for (TsFileReference file : files) {
       file.fillAttributes();
     }
+
+    return files.stream().filter(f -> !f.ignoreFile).collect(Collectors.toList());
   }
 
   File generate(ClassStructure classStructure, File destinationDir) throws Exception {
@@ -87,7 +92,9 @@ public class ConvertModel {
     }
 
     try (PrintStream pr = new PrintStream(javaFile, "UTF-8")) {
-      if (classStructure.hasPackage()) { pr.println("package " + classStructure.aPackage + ";"); }
+      if (classStructure.hasPackage()) {
+        pr.println("package " + classStructure.aPackage + ";");
+      }
       pr.println();
       pr.println(imports.asStr());
       pr.println();
@@ -117,7 +124,9 @@ public class ConvertModel {
   }
 
   static List<String> readLeaveFurther(File javaFile) {
-    if (!javaFile.exists()) { return new ArrayList<>(); }
+    if (!javaFile.exists()) {
+      return new ArrayList<>();
+    }
     try {
       return readLeaveFurther(Files.readAllLines(javaFile.toPath(), StandardCharsets.UTF_8));
     } catch (IOException e) {
@@ -175,7 +184,9 @@ public class ConvertModel {
   }
 
   private static void appendComment(StringBuilder dest, List<String> comment) {
-    if (comment == null) { return; }
+    if (comment == null) {
+      return;
+    }
     for (String line : comment) {
       dest.append(line).append('\n');
     }

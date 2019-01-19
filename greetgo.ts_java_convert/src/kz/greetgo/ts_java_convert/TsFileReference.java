@@ -1,19 +1,8 @@
 package kz.greetgo.ts_java_convert;
 
 
-import kz.greetgo.ts_java_convert.errors.BooleanCannotBeMultipleArray;
-import kz.greetgo.ts_java_convert.errors.CannotFindClassInImports;
-import kz.greetgo.ts_java_convert.errors.ClassCannotBeMultipleArray;
-import kz.greetgo.ts_java_convert.errors.CommaAtLastEnumElement;
-import kz.greetgo.ts_java_convert.errors.NoFileInImport;
-import kz.greetgo.ts_java_convert.errors.NoNumberTypeForJava;
-import kz.greetgo.ts_java_convert.errors.NumberCannotBeMultipleArray;
-import kz.greetgo.ts_java_convert.stru.ClassAttr;
-import kz.greetgo.ts_java_convert.stru.ClassStructure;
-import kz.greetgo.ts_java_convert.stru.EnumElement;
-import kz.greetgo.ts_java_convert.stru.Import;
-import kz.greetgo.ts_java_convert.stru.SimpleType;
-import kz.greetgo.ts_java_convert.stru.TypeDate;
+import kz.greetgo.ts_java_convert.errors.*;
+import kz.greetgo.ts_java_convert.stru.*;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoxedBoolean;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeStr;
@@ -83,7 +72,9 @@ public class TsFileReference {
   private static void scanForTsInner(List<TsFileReference> ret,
                                      File dir, String currentSubPackage) {
     File[] files = dir.listFiles();
-    if (files == null) { throw new NullPointerException("dir.listFiles() == null, dir = " + dir); }
+    if (files == null) {
+      throw new NullPointerException("dir.listFiles() == null, dir = " + dir);
+    }
     for (File subFile : files) {
       if (subFile.isDirectory()) {
         scanForTsInner(ret, subFile, resolvePackage(currentSubPackage, subFile.getName()));
@@ -91,81 +82,92 @@ public class TsFileReference {
       }
       if (subFile.getName().endsWith(".ts")) {
         ret.add(new TsFileReference(subFile, currentSubPackage,
-            subFile.getName().substring(0, subFile.getName().length() - 3)));
+          subFile.getName().substring(0, subFile.getName().length() - 3)));
         continue;
       }
     }
   }
 
   public static String resolvePackage(String subPackage1, String subPackage2) {
-    if (subPackage1 == null || subPackage1.length() == 0) { return subPackage2; }
-    if (subPackage2 == null || subPackage2.length() == 0) { return subPackage1; }
+    if (subPackage1 == null || subPackage1.length() == 0) {
+      return subPackage2;
+    }
+    if (subPackage2 == null || subPackage2.length() == 0) {
+      return subPackage1;
+    }
     return subPackage1 + '.' + subPackage2;
   }
 
   final List<String> classComment = new ArrayList<>();
   boolean wasClassDefinition = false;
   boolean wasEnumDefinition = false;
+  boolean ignoreFile = false;
 
   public void fillAttributes() throws Exception {
     wasClassDefinition = false;
     wasEnumDefinition = false;
+    ignoreFile = false;
 
     int lineNo = 1;
     for (String line : content().split("\n")) {
       parseLine(lineNo++, line);
+      if (ignoreFile) {
+        return;
+      }
     }
 
     if (!wasClassDefinition && !wasEnumDefinition) {
-      throw new RuntimeException("No class or enum definition in " + tsFile);
+      throw new NoDefinitionInTsFile(tsFile);
     }
   }
 
   private static final Pattern CLASS_DEFINITION
-      = Pattern.compile("\\s*export\\s+class\\s+(\\w+)[^{]*\\{\\s*");
+    = Pattern.compile("\\s*export\\s+class\\s+(\\w+)[^{]*\\{\\s*");
 
   private static final Pattern ENUM_DEFINITION
-      = Pattern.compile("\\s*export\\s+enum\\s+(\\w+)[^{]*\\{\\s*");
+    = Pattern.compile("\\s*export\\s+enum\\s+(\\w+)[^{]*\\{\\s*");
 
   //public world: string;
   private static final Pattern STRING_FIELD
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*string\\s*(\\[\\s*]\\s*)?\\s*(\\|\\s*null)?.*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*string\\s*(\\[\\s*]\\s*)?\\s*(\\|\\s*null)?.*(=.*)?;.*");
 
   private static final Pattern STRING_FIELD2
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?.*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*string\\s*(\\[\\s*]\\s*)?.*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_array_hasOrAbsent
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\[\\s*])?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\[\\s*])?\\s*(/\\*\\s*(\\w+)\\s*\\*/)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_null
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\|)?\\s*(null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(\\|)?\\s*(null)?\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*number\\s*(\\|)?\\s*(null)?\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(\\|)?\\s*(null)?\\s*(=.*)?;.*");
 
   private static final Pattern NUMBER_FIELD_null2
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*number\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*number\\s*(/\\*\\s*(\\w+)\\s*\\*/)\\s*(=.*)?;.*");
 
   //import {OrgUnitKind} from "./org_unit/OrgUnitKind";
   private static final Pattern IMPORT
-      = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*[\"']\\./([^\"']*\\w)[\"']\\s*;.*");
+    = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*[\"']\\./([^\"']*\\w)[\"']\\s*;.*");
 
   //import {OrgUnitKind} from "../org_unit/OrgUnitKind";
   private static final Pattern IMPORT_PARENT
-      = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*[\"']\\.\\./([^\"']*\\w)[\"']\\s*;.*");
+    = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*[\"']\\.\\./([^\"']*\\w)[\"']\\s*;.*");
 
   //import {OrgUnitKind} from "@/org_unit/OrgUnitKind";
   private static final Pattern IMPORT_SOURCE
-      = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*\"@/([^\"]*\\w)\"\\s*;.*");
+    = Pattern.compile("\\s*import\\s+\\{(\\w+)}\\s+from\\s*\"@/([^\"]*\\w)\"\\s*;.*");
 
   //public bArray: OrgUnitRoot|null[];
   private static final Pattern CLASS_FIELD
-      = Pattern.compile("\\s*public\\s*(\\w+)\\s*!?:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s*(\\w+)\\s*!?:\\s*(null\\s*\\|)?\\s*(\\w+)\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
 
   //public hasChildren: boolean|null[];
   private static final Pattern BOOLEAN_FIELD
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*boolean\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*boolean\\s*(\\[\\s*])?\\s*(\\|\\s*null)?\\s*(\\[\\s*])?\\s*(=.*)?;.*");
 
   private static final Pattern BOOLEAN_FIELD_null
-      = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*(=.*)?;.*");
+    = Pattern.compile("\\s*public\\s+(\\w+)\\s*!?:\\s*null\\s*\\|\\s*boolean\\s*(\\[\\s*])?\\s*(=.*)?;.*");
+
+  private static final Pattern IGNORE_FILE = Pattern.compile("\\s*///\\s*ignore\\s+file\\s*", Pattern.CASE_INSENSITIVE);
 
   final Map<String, Import> importMap = new HashMap<>();
   public final List<ClassAttr> attrList = new ArrayList<>();
@@ -188,6 +190,14 @@ public class TsFileReference {
       comment.add(line);
       inComment = true;
       return;
+    }
+
+    {
+      Matcher matcher = IGNORE_FILE.matcher(line);
+      if (matcher.matches()) {
+        ignoreFile = true;
+        return;
+      }
     }
 
     {
@@ -264,8 +274,12 @@ public class TsFileReference {
       }
     }
 
-    if (wasClassDefinition) { parseForClassField(line, lineNo); }
-    if (wasEnumDefinition) { parseForEnumElement(line, lineNo); }
+    if (wasClassDefinition) {
+      parseForClassField(line, lineNo);
+    }
+    if (wasEnumDefinition) {
+      parseForEnumElement(line, lineNo);
+    }
 
   }
 
@@ -282,7 +296,9 @@ public class TsFileReference {
         String elementValue = matcher.group(2);
         boolean hasComma = matcher.group(3) != null;
 
-        if (!hasComma) { throw new CommaAtLastEnumElement(place(lineNo)); }
+        if (!hasComma) {
+          throw new CommaAtLastEnumElement(place(lineNo));
+        }
 
         enumElementList.add(new EnumElement(elementName, elementValue, comment));
 
@@ -299,7 +315,9 @@ public class TsFileReference {
         String elementValue = matcher.group(2);
         boolean hasComma = matcher.group(3) != null;
 
-        if (!hasComma) { throw new CommaAtLastEnumElement(place(lineNo)); }
+        if (!hasComma) {
+          throw new CommaAtLastEnumElement(place(lineNo));
+        }
 
         enumElementList.add(new EnumElement(elementName, elementValue, comment));
 
@@ -337,13 +355,17 @@ public class TsFileReference {
         boolean leftSquareBrackets = matcher.group(2) != null;
         String strType = matcher.group(4);
         boolean rightSquareBrackets = matcher.group(5) != null;
-        if (leftSquareBrackets && rightSquareBrackets) { throw new NumberCannotBeMultipleArray(place(lineNo)); }
-        if (strType == null) { throw new NoNumberTypeForJava(place(lineNo)); }
+        if (leftSquareBrackets && rightSquareBrackets) {
+          throw new NumberCannotBeMultipleArray(place(lineNo));
+        }
+        if (strType == null) {
+          throw new NoNumberTypeForJava(place(lineNo));
+        }
         attrList.add(new ClassAttr(
-            SimpleType.fromStr(strType, false, place(lineNo)),
-            fieldName,
-            leftSquareBrackets || rightSquareBrackets,
-            comment
+          SimpleType.fromStr(strType, false, place(lineNo)),
+          fieldName,
+          leftSquareBrackets || rightSquareBrackets,
+          comment
         ));
         comment.clear();
         return;
@@ -360,12 +382,14 @@ public class TsFileReference {
 
         boolean hasNull = nullLeft || nullRight;
 
-        if (strType == null) { throw new NoNumberTypeForJava(place(lineNo)); }
+        if (strType == null) {
+          throw new NoNumberTypeForJava(place(lineNo));
+        }
         attrList.add(new ClassAttr(
-            SimpleType.fromStr(strType, hasNull, place(lineNo)),
-            fieldName,
-            false,
-            comment
+          SimpleType.fromStr(strType, hasNull, place(lineNo)),
+          fieldName,
+          false,
+          comment
         ));
         comment.clear();
         return;
@@ -378,12 +402,14 @@ public class TsFileReference {
         String fieldName = matcher.group(1);
         String strType = matcher.group(3);
 
-        if (strType == null) { throw new NoNumberTypeForJava(place(lineNo)); }
+        if (strType == null) {
+          throw new NoNumberTypeForJava(place(lineNo));
+        }
         attrList.add(new ClassAttr(
-            SimpleType.fromStr(strType, true, place(lineNo)),
-            fieldName,
-            false,
-            comment
+          SimpleType.fromStr(strType, true, place(lineNo)),
+          fieldName,
+          false,
+          comment
         ));
         comment.clear();
         return;
@@ -399,16 +425,20 @@ public class TsFileReference {
         boolean isNull = matcher.group(3) != null;
         boolean rightArray = matcher.group(4) != null;
 
-        if (leftArray && rightArray) { throw new BooleanCannotBeMultipleArray(place(lineNo)); }
+        if (leftArray && rightArray) {
+          throw new BooleanCannotBeMultipleArray(place(lineNo));
+        }
 
         boolean boxed = isNull, isArray = leftArray || rightArray;
-        if (isArray) { boxed = true; }
+        if (isArray) {
+          boxed = true;
+        }
 
         attrList.add(new ClassAttr(
-            boxed ? SimpleTypeBoxedBoolean.get() : SimpleTypeBoolean.get(),
-            fieldName,
-            isArray,
-            comment
+          boxed ? SimpleTypeBoxedBoolean.get() : SimpleTypeBoolean.get(),
+          fieldName,
+          isArray,
+          comment
         ));
 
         comment.clear();
@@ -423,10 +453,10 @@ public class TsFileReference {
         boolean isArray = matcher.group(2) != null;
 
         attrList.add(new ClassAttr(
-            SimpleTypeBoxedBoolean.get(),
-            fieldName,
-            isArray,
-            comment
+          SimpleTypeBoxedBoolean.get(),
+          fieldName,
+          isArray,
+          comment
         ));
 
         comment.clear();
@@ -472,7 +502,7 @@ public class TsFileReference {
       Import anotherImport = importMap.get(className);
       if (anotherImport != null) {
         throw new RuntimeException(className + " already defined at line " + anotherImport.lineNo
-            + " in " + place(lineNo));
+          + " in " + place(lineNo));
       }
     }
 
@@ -491,7 +521,9 @@ public class TsFileReference {
     File canonicalFile = importedFile.getCanonicalFile();
 
     for (TsFileReference anotherFile : anotherFiles) {
-      if (canonicalFile.equals(anotherFile.tsFile.getCanonicalFile())) { return anotherFile; }
+      if (canonicalFile.equals(anotherFile.tsFile.getCanonicalFile())) {
+        return anotherFile;
+      }
     }
 
     if (ConvertModelUtil.isParent(sourceDir, importedFile)) {

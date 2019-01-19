@@ -1,5 +1,6 @@
 package kz.greetgo.ts_java_convert;
 
+import kz.greetgo.ts_java_convert.errors.NoDefinitionInTsFile;
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
 import kz.greetgo.ts_java_convert.test_bpm_manager.PathWithBpmManager;
 import kz.greetgo.util.RND;
@@ -166,6 +167,7 @@ public class ConvertModelTest {
   public void test_ConvertModelBuilder_with_BpmManager() throws Exception {
     PathWithBpmManager dir = new PathWithBpmManager();
     dir.read("model/BpmListRow.ts");
+    dir.read("model/createEmptyBpmListRow.ts");
     dir.read("model/bpm/manager/BpmManagerContent.ts");
     dir.read("model/bpm/manager/BpmRecord.ts");
 
@@ -196,5 +198,47 @@ public class ConvertModelTest {
     lines = Files.readAllLines(javaFile);
 
     assertThat(lines.get(2)).isEqualTo("import asd.asd.Wow;");
+  }
+
+  @Test(expectedExceptions = NoDefinitionInTsFile.class)
+  public void test_ConvertModelBuilder_NoDefinitionInTsFile() throws Exception {
+    PathWithBpmManager dir = new PathWithBpmManager();
+    dir.read("model/BpmListRow.ts");
+    dir.read("model/createEmptyBpmListRow.ts");
+    dir.read("model/bpm/manager/BpmManagerContent.ts");
+    dir.read("model/bpm/manager/BpmRecord.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "kz.greetgo.bpm.models";
+
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
+  }
+
+  @Test
+  public void test_ConvertModelBuilder_fileWithoutDefinition() throws Exception {
+    PathWithBpmManager dir = new PathWithBpmManager();
+    dir.read("model/BpmListRow.ts");
+    dir.read("model/bpm/manager/BpmManagerContent.ts");
+    dir.read("model/bpm/manager/BpmRecord.ts");
+    dir.read("model/bpm/manager/createBpmRecord.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "kz.greetgo.bpm.models";
+
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
   }
 }
