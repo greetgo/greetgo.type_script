@@ -1,6 +1,7 @@
 package kz.greetgo.ts_java_convert;
 
 
+import kz.greetgo.ts_java_convert.definitions.ClassDefinition;
 import kz.greetgo.ts_java_convert.errors.*;
 import kz.greetgo.ts_java_convert.stru.*;
 import kz.greetgo.ts_java_convert.stru.simple.SimpleTypeBoolean;
@@ -121,9 +122,6 @@ public class TsFileReference {
     }
   }
 
-  private static final Pattern CLASS_DEFINITION
-    = Pattern.compile("\\s*export\\s+class\\s+(\\w+)[^{]*\\{\\s*");
-
   private static final Pattern ENUM_DEFINITION
     = Pattern.compile("\\s*export\\s+enum\\s+(\\w+)[^{]*\\{\\s*");
 
@@ -234,14 +232,14 @@ public class TsFileReference {
       }
     }
 
+
     {
-      Matcher matcher = CLASS_DEFINITION.matcher(line);
-      //noinspection Duplicates
-      if (matcher.matches()) {
+      ClassDefinition classDefinition = ClassDefinition.match(line);
+      if (classDefinition != null) {
         if (wasEnumDefinition) {
           throw new RuntimeException("You cannot define enum and class in one file: " + place(lineNo));
         }
-        String lineClassName = matcher.group(1);
+        String lineClassName = classDefinition.lineClassName;
         registerImport(lineNo, lineClassName, tsFile);
         if (lineClassName.equals(className)) {
           wasClassDefinition = true;
