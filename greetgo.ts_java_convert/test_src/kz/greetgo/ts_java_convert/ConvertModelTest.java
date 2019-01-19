@@ -241,4 +241,56 @@ public class ConvertModelTest {
 
     convertModel.execute();
   }
+
+  @Test
+  public void test_ConvertModelBuilder_extends() throws Exception {
+    PathWithBpmManager dir = new PathWithBpmManager();
+    dir.read("model2/BaseClass.ts");
+    dir.read("model2/ChildClass0.ts");
+    dir.read("model2/ChildClass1.ts");
+    dir.read("model2/ChildClass2.ts");
+    dir.read("model2/OnlyInterfaceClass1.ts");
+    dir.read("model2/OnlyInterfaceClass2.ts");
+    dir.read("out_of_model/SuperTestInterface1.ts");
+    dir.read("out_of_model/SuperTestInterface2.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "kz.greetgo.bpm.models2";
+
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model2")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
+
+    Path packageDir = dir.destinationDir().toPath().resolve("kz/greetgo/bpm/models2");
+
+    {
+      Path javaFile = packageDir.resolve("ChildClass0.java");
+
+      String javaContent = String.join("\n", Files.readAllLines(javaFile));
+
+      assertThat(javaContent).contains("class ChildClass0 extends BaseClass");
+    }
+    {
+      Path javaFile = packageDir.resolve("ChildClass1.java");
+
+      String javaContent = String.join("\n", Files.readAllLines(javaFile));
+
+      assertThat(javaContent).contains("class ChildClass1 extends BaseClass");
+    }
+    {
+      Path javaFile = packageDir.resolve("ChildClass2.java");
+
+      String javaContent = String.join("\n", Files.readAllLines(javaFile));
+
+      assertThat(javaContent).contains("class ChildClass2 extends BaseClass");
+    }
+
+    assertThat(packageDir.resolve("OnlyInterfaceClass1.java").toFile()).exists();
+    assertThat(packageDir.resolve("OnlyInterfaceClass2.java").toFile()).exists();
+  }
 }
