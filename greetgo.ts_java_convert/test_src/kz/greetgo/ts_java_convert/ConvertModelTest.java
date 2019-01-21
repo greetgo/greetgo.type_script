@@ -2,6 +2,7 @@ package kz.greetgo.ts_java_convert;
 
 import kz.greetgo.ts_java_convert.errors.NoDefinitionInTsFile;
 import kz.greetgo.ts_java_convert.test_ConvertModel.ConvertModelDir;
+import kz.greetgo.ts_java_convert.test_arrays.ModelsForTestArray;
 import kz.greetgo.ts_java_convert.test_bpm_manager.PathWithBpmManager;
 import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
@@ -328,5 +329,30 @@ public class ConvertModelTest {
     assertThat(javaContent).contains("import kz.greetgo.bpm3.working_package.sub_package.RefInSubPackage;");
 
     assertThat(javaContent).doesNotContain("import kz.greetgo.bpm3.working_package.RefInSamePackage;");
+  }
+
+  @Test
+  public void testName() throws Exception {
+    ModelsForTestArray dir = new ModelsForTestArray();
+    dir.read("model/ArrayElement.ts");
+    dir.read("model/EntityWithArray.ts");
+
+    File sourceDir = dir.sourceDir();
+    File destinationDir = dir.destinationDir();
+    String destinationPackage = "pack.one";
+
+    ConvertModel convertModel = new ConvertModelBuilder()
+      .sourceDir(sourceDir, "model")
+      .destinationDir(destinationDir)
+      .destinationPackage(destinationPackage)
+      .create();
+
+    convertModel.execute();
+
+    Path javaFilePath = dir.destinationDir().toPath().resolve("pack/one/EntityWithArray.java");
+
+    String javaContent = String.join("\n", Files.readAllLines(javaFilePath));
+
+    assertThat(javaContent).contains("public List<ArrayElement> arrayAtr = new ArrayList<>();");
   }
 }
